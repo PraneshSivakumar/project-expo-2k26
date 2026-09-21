@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT EXPO 2K26 — Intelligent Innovation & Registration Platform</title>
+  <meta name="description" content="Official registration and project submission portal for Project Expo 2K26. Intra-college innovation hackathon, project showcase, and technical symposium.">
+  
+  <!-- Mintlify-inspired Typography: Inter + Instrument Serif (Arizona Flare aesthetic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <header class="sticky-nav" id="main-nav">
+    <div class="nav-container">
+      <a href="/index.html" class="brand-logo" id="nav-brand">
+        <div class="brand-text-wrap">
+          <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="nav-menu">
+        <a href="/index.html" class="nav-link active">Home</a>
+        <a href="/about.html" class="nav-link">About</a>
+        <a href="/schedule.html" class="nav-link">Schedule</a>
+        <a href="/guidelines.html" class="nav-link">Guidelines</a>
+        <a href="/registration.html" class="nav-link nav-highlight">Registration</a>
+        
+        <a href="/faq.html" class="nav-link">FAQ</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+
+        <a href="/registration.html" class="btn btn-primary btn-sm" id="nav-cta-btn">
+          <span>Register Now</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+<main>
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero">
+      <div class="hero-bg-blobs">
+        <div class="blob blob-mint"></div>
+        <div class="blob blob-teal"></div>
+      </div>
+      </div>
+
+      <div class="container hero-content">
+        <div class="hero-pill-badge" id="hero-badge">
+          <span class="status-indicator-dot"></span>
+          <span class="badge-text">INTRA-COLLEGE EVENT 2026 • REGISTRATIONS ARE LIVE</span>
+          <span class="badge-chevron">→</span>
+        </div>
+
+        <h1 class="hero-title" id="hero-heading">
+          Ideas Today. <br>
+          <span class="editorial-accent">A Better Tomorrow.</span>
+        </h1>
+
+        <p class="hero-subtext">
+          A premier engineering platform for students to showcase innovative projects, tackle real-world industry challenges, collaborate with peers, and create measurable technological impact.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-cta-group">
+          <a href="#registration" class="btn btn-primary btn-lg" id="hero-register-btn">
+            <span>Register Your Team</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#guidelines" class="btn btn-secondary btn-lg" id="hero-guidelines-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>View Guidelines</span>
+          </a>
+          <a href="#submission" class="btn btn-ghost btn-lg" id="hero-submit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Submit Abstract / PPT</span>
+          </a>
+        </div>
+
+        <!-- Event Key Details Bar -->
+        <div class="hero-event-strip">
+          <div class="strip-item">
+            <div class="strip-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="strip-meta">
+              <span class="strip-label">Event Date</span>
+              <span class="strip-value">Sept 29, 2026 • 10:00 AM</span>
+            </div>
+          </div>
+          <div class="strip-divider"></div>
+          <div class="strip-item">
+            <div class="strip-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="strip-meta">
+              <span class="strip-label">Venue</span>
+              <span class="strip-value">VSB Auditorium</span>
+            </div>
+          </div>
+          <div class="strip-divider"></div>
+          <div class="strip-item">
+            <div class="strip-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="strip-meta">
+              <span class="strip-label">Eligibility</span>
+              <span class="strip-value">Open to All</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Countdown Widget -->
+        <div class="countdown-card" id="countdown-banner">
+          <div class="countdown-header">
+            <div class="countdown-pulse-tag">
+              <span class="pulse-ring"></span>
+              <span class="pulse-core"></span>
+              Registration Deadline Approaching
+            </div>
+            <span class="countdown-target-date">Closes Sept 28, 2026 • 11:59 PM IST</span>
+          </div>
+          <div class="countdown-timer" id="countdown-timer">
+            <div class="time-block">
+              <span class="time-number" id="count-days">18</span>
+              <span class="time-label">Days</span>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="time-block">
+              <span class="time-number" id="count-hours">07</span>
+              <span class="time-label">Hours</span>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="time-block">
+              <span class="time-number" id="count-minutes">42</span>
+              <span class="time-label">Mins</span>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="time-block">
+              <span class="time-number" id="count-seconds">15</span>
+              <span class="time-label">Secs</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    
+</main>
+
+  <!-- Mintlify-Inspired Minimalist Clean Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-icon">❖</span>
+          <span class="footer-title">PROJECT EXPO 2K26</span>
+        </div>
+        <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
+        <span class="footer-copyright">© 2026 Project Expo. Designed with Mintlify Aesthetic for Students & Creators.</span>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Navigation</span>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About & Vision</a>
+        <a href="/schedule.html">Event Schedule</a>
+        <a href="/guidelines.html">Rules & Rubric</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Portals</span>
+        <a href="/registration.html">Team Registration</a>
+        
+        <a href="/faq.html">FAQ Help Desk</a>
+        <a href="/contact.html">Campus Venue</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Community</span>
+        <span class="f-subtext">Department of Technical Education</span>
+        <span class="f-subtext">Innovation & Incubation Cell</span>
+        <div class="social-pills">
+          <a href="#" class="social-pill" title="GitHub">GH</a>
+          <a href="#" class="social-pill" title="LinkedIn">IN</a>
+          <a href="#" class="social-pill" title="Instagram">IG</a>
+          <a href="#" class="social-pill" title="YouTube">YT</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

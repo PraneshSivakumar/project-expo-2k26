@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT EXPO 2K26 — Intelligent Innovation & Registration Platform</title>
+  <meta name="description" content="Official registration and project submission portal for Project Expo 2K26. Intra-college innovation hackathon, project showcase, and technical symposium.">
+  
+  <!-- Mintlify-inspired Typography: Inter + Instrument Serif (Arizona Flare aesthetic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <header class="sticky-nav" id="main-nav">
+    <div class="nav-container">
+      <a href="/index.html" class="brand-logo" id="nav-brand">
+        <div class="brand-text-wrap">
+          <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
+        </div>
+      </a>
+
+      
+
+      <div class="nav-actions">
+
+        <a href="/registration.html" class="btn btn-primary btn-sm" id="nav-cta-btn">
+          <span>Register Now</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section-container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; background-color: var(--color-background-subtle);" id="admin-login-view">
+      <div class="bento-card" style="max-width: 400px; width: 100%; text-align: center; padding: 40px;">
+        <h2 class="section-title" style="font-size: 2rem; margin-bottom: 10px;">Admin Portal</h2>
+        <p class="section-subtitle" style="margin-bottom: 30px;">Enter master password to access submissions.</p>
+        <div class="form-group">
+          <input type="password" id="admin-password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-admin-login" style="width: 100%; justify-content: center;">Login</button>
+        <span class="field-error" id="err-admin-login" style="margin-top: 10px; display: block;"></span>
+      </div>
+    </section>
+
+    <section class="section-container hidden" style="min-height: 80vh; display: none;" id="admin-dashboard-view">
+      <div class="container" style="max-width: 1200px;">
+        <div class="section-header">
+          <h2 class="section-title">Project Submissions Dashboard</h2>
+          <p class="section-subtitle">Real-time repository of all finalized team registrations and assets.</p>
+        </div>
+        <div class="bento-card" style="padding: 20px; overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--color-border); color: var(--color-foreground-muted);">
+                <th style="padding: 12px 16px;">Team Name</th>
+                <th style="padding: 12px 16px;">Leader</th>
+                <th style="padding: 12px 16px;">Project Type</th>
+                <th style="padding: 12px 16px;">PPT (File)</th>
+                <th style="padding: 12px 16px;">GitHub URL</th>
+                <th style="padding: 12px 16px;">Drive URL</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+              <!-- Dynamically populated rows will go here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-icon">❖</span>
+          <span class="footer-title">PROJECT EXPO 2K26</span>
+        </div>
+        <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
+        <span class="footer-copyright">© 2026 Project Expo. Designed with Mintlify Aesthetic for Students & Creators.</span>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Navigation</span>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About & Vision</a>
+        <a href="/schedule.html">Event Schedule</a>
+        <a href="/guidelines.html">Rules & Rubric</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Portals</span>
+        <a href="/registration.html">Team Registration</a>
+        
+        <a href="/faq.html">FAQ Help Desk</a>
+        <a href="/contact.html">Campus Venue</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Community</span>
+        <span class="f-subtext">Department of Technical Education</span>
+        <span class="f-subtext">Innovation & Incubation Cell</span>
+        <div class="social-pills">
+          <a href="#" class="social-pill" title="GitHub">GH</a>
+          <a href="#" class="social-pill" title="LinkedIn">IN</a>
+          <a href="#" class="social-pill" title="Instagram">IG</a>
+          <a href="#" class="social-pill" title="YouTube">YT</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT EXPO 2K26 — Intelligent Innovation & Registration Platform</title>
+  <meta name="description" content="Official registration and project submission portal for Project Expo 2K26. Intra-college innovation hackathon, project showcase, and technical symposium.">
+  
+  <!-- Mintlify-inspired Typography: Inter + Instrument Serif (Arizona Flare aesthetic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <header class="sticky-nav" id="main-nav">
+    <div class="nav-container">
+      <a href="/index.html" class="brand-logo" id="nav-brand">
+        <div class="brand-text-wrap">
+          <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="nav-menu">
+        <a href="/index.html" class="nav-link">Home</a>
+        <a href="/about.html" class="nav-link">About</a>
+        <a href="/schedule.html" class="nav-link">Schedule</a>
+        <a href="/guidelines.html" class="nav-link">Guidelines</a>
+        <a href="/registration.html" class="nav-link nav-highlight">Registration</a>
+        
+        <a href="/faq.html" class="nav-link active">FAQ</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+
+        <a href="/registration.html" class="btn btn-primary btn-sm" id="nav-cta-btn">
+          <span>Register Now</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+<main>
+<!-- SECTION 07: FAQS ACCORDION WITH LIVE SEARCH -->
+    <section class="section-container" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-eyebrow">FREQUENTLY ASKED QUESTIONS</div>
+          <h2 class="section-title">Answers to Common Questions</h2>
+          <p class="section-subtitle">
+            Find quick answers regarding team composition, presentation requirements, hardware facilities, and certificates.
+          </p>
+          
+          <!-- Live FAQ Search Filter -->
+          <div class="faq-search-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="faq-search-input" class="faq-search-field">
+          </div>
+        </div>
+
+        <div class="faq-accordion" id="faq-accordion-list">
+          <div class="faq-item" data-keywords="team size members inter department">
+            <button type="button" class="faq-question">
+              <span>What is the permitted team size and can we form inter-department teams?</span>
+              <span class="faq-chevron">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>Teams must comprise between 2 and 5 members. Inter-department teams are fully encouraged! In fact, multidisciplinary teams combining computer science with electronics, mechanical, or biotechnology often score higher in feasibility and real-world execution.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" data-keywords="certificates cash prize awards jury">
+            <button type="button" class="faq-question">
+              <span>What prizes and certificates will participants receive?</span>
+              <span class="faq-chevron">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>Every student who presents their project in the preliminary and final rounds receives an official Certificate of Participation. Top winning teams across all 4 tracks will receive cash prizes totaling ₹1,50,000+, trophies, and potential seed grant incubation support from the Campus Entrepreneurship Cell.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" data-keywords="intellectual property ip rights patent code">
+            <button type="button" class="faq-question">
+              <span>Who owns the intellectual property (IP) of the submitted project?</span>
+              <span class="faq-chevron">▼</span>
+            </button>
+            <div class="faq-answer">
+              <p>100% of the Intellectual Property belongs exclusively to the student creators. The college and organizers make no claim over your source code, hardware designs, or patent rights. We also offer guidance on filing provisional patents through the College IPR Cell.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+</main>
+
+  <!-- Mintlify-Inspired Minimalist Clean Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-icon">❖</span>
+          <span class="footer-title">PROJECT EXPO 2K26</span>
+        </div>
+        <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
+        <span class="footer-copyright">© 2026 Project Expo. Designed with Mintlify Aesthetic for Students & Creators.</span>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Navigation</span>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About & Vision</a>
+        <a href="/schedule.html">Event Schedule</a>
+        <a href="/guidelines.html">Rules & Rubric</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Portals</span>
+        <a href="/registration.html">Team Registration</a>
+        
+        <a href="/faq.html">FAQ Help Desk</a>
+        <a href="/contact.html">Campus Venue</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Community</span>
+        <span class="f-subtext">Department of Technical Education</span>
+        <span class="f-subtext">Innovation & Incubation Cell</span>
+        <div class="social-pills">
+          <a href="#" class="social-pill" title="GitHub">GH</a>
+          <a href="#" class="social-pill" title="LinkedIn">IN</a>
+          <a href="#" class="social-pill" title="Instagram">IG</a>
+          <a href="#" class="social-pill" title="YouTube">YT</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

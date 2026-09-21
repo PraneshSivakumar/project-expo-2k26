@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Python helper scripts (not needed in production)
+*.py
+
+# Build output
+dist/
+
+# Backup files
+*.txt
+out.txt
+tool_responses.txt
+app_js_backup.txt
+index_html_backup.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

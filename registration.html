@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT EXPO 2K26 — Intelligent Innovation & Registration Platform</title>
+  <meta name="description" content="Official registration and project submission portal for Project Expo 2K26. Intra-college innovation hackathon, project showcase, and technical symposium.">
+  
+  <!-- Mintlify-inspired Typography: Inter + Instrument Serif (Arizona Flare aesthetic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <header class="sticky-nav" id="main-nav">
+    <div class="nav-container">
+      <a href="/index.html" class="brand-logo" id="nav-brand">
+        <div class="brand-text-wrap">
+          <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="nav-menu">
+        <a href="/index.html" class="nav-link">Home</a>
+        <a href="/about.html" class="nav-link">About</a>
+        <a href="/schedule.html" class="nav-link">Schedule</a>
+        <a href="/guidelines.html" class="nav-link">Guidelines</a>
+        <a href="/registration.html" class="nav-link nav-highlight">Registration</a>
+        
+        <a href="/faq.html" class="nav-link">FAQ</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+
+        <a href="/registration.html" class="btn btn-primary btn-sm" id="nav-cta-btn">
+          <span>Register Now</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+<main>
+<!-- SECTION 05: INTERACTIVE MULTI-STEP REGISTRATION PORTAL -->
+    <section class="section-container registration-section-bg" id="registration">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-eyebrow">05. REGISTRATION PORTAL</div>
+          <h2 class="section-title">Create your team and register <br><span class="serif-title">for Project Expo 2K26.</span></h2>
+          <p class="section-subtitle">
+            Complete the 4 simple steps below to generate your official registration pass and team ID.
+          </p>
+        </div>
+
+        <!-- Wizard Shell -->
+        <div class="wizard-container" id="wizard-root">
+          <!-- Wizard Stepper Nav -->
+          <div class="wizard-stepper">
+            <button type="button" class="step-item active" data-step="1" id="step-btn-1">
+              <span class="step-circle">1</span>
+              <span class="step-meta">
+                <span class="step-label">Step 01</span>
+                <span class="step-name">Team Information</span>
+              </span>
+            </button>
+            <div class="step-connector"></div>
+            <button type="button" class="step-item" data-step="2" id="step-btn-2">
+              <span class="step-circle">2</span>
+              <span class="step-meta">
+                <span class="step-label">Step 02</span>
+                <span class="step-name">Project Details</span>
+              </span>
+            </button>
+            <div class="step-connector"></div>
+            <button type="button" class="step-item" data-step="3" id="step-btn-3">
+              <span class="step-circle">3</span>
+              <span class="step-meta">
+                <span class="step-label">Step 03</span>
+                <span class="step-name">Team Members</span>
+              </span>
+            </button>
+            <div class="step-connector"></div>
+            <button type="button" class="step-item" data-step="4" id="step-btn-4">
+              <span class="step-circle">4</span>
+              <span class="step-meta">
+                <span class="step-label">Step 04</span>
+                <span class="step-name">Review</span>
+              </span>
+            </button>
+            <div class="step-connector"></div>
+            <button type="button" class="step-item" data-step="5" id="step-btn-5">
+              <span class="step-circle">5</span>
+              <span class="step-meta">
+                <span class="step-label">Step 05</span>
+                <span class="step-name">Submission</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Wizard Form Body -->
+          <form class="wizard-form" id="registration-form" novalidate>
+            
+            <!-- STEP 1: TEAM INFORMATION -->
+            <div class="wizard-step-pane active" id="pane-step-1">
+              <div class="pane-header">
+                <div class="pane-badge">01. Team Information</div>
+                <h3 class="pane-title">Team Leader & Organization Details</h3>
+                <p class="pane-desc">Designate your team leader who will act as the primary contact point for event communications.</p>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-12">
+                  <label for="team-name" class="form-label required">Team Name</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <input type="text" id="team-name" class="form-input" required>
+                  </div>
+                  <span class="field-error" id="err-team-name"></span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="leader-name" class="form-label required">Team Leader Name</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+                    <input type="text" id="leader-name" class="form-input" required>
+                  </div>
+                  <span class="field-error" id="err-leader-name"></span>
+                </div>
+                <div class="form-group col-6">
+                  <label for="leader-email" class="form-label required">Leader College / Personal Email</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <input type="email" id="leader-email" class="form-input" required>
+                  </div>
+                  <span class="field-error" id="err-leader-email"></span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-4">
+                  <label for="leader-phone" class="form-label required">WhatsApp Contact Number</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <input type="tel" id="leader-phone" class="form-input" required>
+                  </div>
+                  <span class="field-error" id="err-leader-phone"></span>
+                </div>
+                <div class="form-group col-4">
+                  <label for="leader-dept" class="form-label required">Department</label>
+                  <select id="leader-dept" class="form-input form-select" required>
+                    <option value="" disabled selected>Select Department</option>
+                    <option value="Computer Science & Engineering (CSE)">Computer Science & Engg (CSE)</option>
+                    <option value="Artificial Intelligence & Data Science (AI&DS)">AI & Data Science (AI&DS)</option>
+                    <option value="Information Technology (IT)">Information Technology (IT)</option>
+                    <option value="Electronics & Communication (ECE)">Electronics & Comm (ECE)</option>
+                    <option value="Electrical & Electronics (EEE)">Electrical & Electronics (EEE)</option>
+                    <option value="Mechanical Engineering (MECH)">Mechanical Engineering (MECH)</option>
+                  </select>
+                  <span class="field-error" id="err-leader-dept"></span>
+                </div>
+                <div class="form-group col-4">
+                  <label for="leader-year" class="form-label required">Current Academic Year</label>
+                  <select id="leader-year" class="form-input form-select" required>
+                    <option value="" disabled selected>Select Year</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                  </select>
+                  <span class="field-error" id="err-leader-year"></span>
+                </div>
+              </div>
+
+              <div class="pane-footer">
+                <span class="helper-note">All fields marked with * are mandatory</span>
+                <button type="button" class="btn btn-primary" id="btn-next-step-1">
+                  <span>Next: Project Details</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2: PROJECT DETAILS -->
+            <div class="wizard-step-pane" id="pane-step-2">
+              <div class="pane-header">
+                <div class="pane-badge">02. Project Concept</div>
+                <h3 class="pane-title">Project Title</h3>
+                <p class="pane-desc">Describe what your team is building, the core problem it solves, and the technologies used.</p>
+              </div>
+
+              <div class="form-group">
+                <label for="project-title" class="form-label required">Project Title</label>
+                <input type="text" id="project-title" class="form-input" required>
+                <span class="field-error" id="err-project-title"></span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-12">
+                  <label class="form-label required">PPT Submission (PDF Only)</label>
+                  <input type="file" id="ppt-upload" class="form-input" accept=".pdf" required>
+                </div>
+              </div>
+
+              
+
+              <!-- Project Type Radio Pills -->
+              <div class="form-group">
+                <label class="form-label required">Project Type</label>
+                <div class="pill-radio-group">
+                  <label class="pill-radio selected">
+                    <input type="radio" name="project_type" value="Software Project" checked>
+                    <span>💻 Software Project</span>
+                  </label>
+                  <label class="pill-radio">
+                    <input type="radio" name="project_type" value="Hardware Project">
+                    <span>⚙️ Hardware Project</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6" id="repo-link-group">
+                  <label for="repo-link" class="form-label">GitHub Repository / Source Link (Optional)</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <input type="url" id="repo-link" class="form-input">
+                  </div>
+                </div>
+                <div class="form-group col-6">
+                  <label for="demo-link" id="demo-link-label" class="form-label">Live Demo / Video Link (Optional)</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <input type="url" id="demo-link" class="form-input">
+                  </div>
+                </div>
+              </div>
+
+              <div class="pane-footer">
+                <button type="button" class="btn btn-secondary" id="btn-back-step-2">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 12-7-7-7 7M12 19V5"/></svg>
+                  <span>Back</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-next-step-2">
+                  <span>Next: Team Members</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 3: TEAM MEMBERS -->
+            <div class="wizard-step-pane" id="pane-step-3">
+              <div class="pane-header">
+                <div class="pane-badge">03. Squad Roster</div>
+                <h3 class="pane-title">Team Members (1 to 3 Members)</h3>
+                <p class="pane-desc">Team Leader is registered as Member #1. Add up to 2 additional collaborators below.</p>
+              </div>
+
+              <!-- Leader Card Preview -->
+              <div class="leader-preview-banner" id="leader-roster-preview">
+                <div class="roster-avatar">👑</div>
+                <div class="roster-meta">
+                  <span class="roster-role-tag">Team Leader (Member 1)</span>
+                  <h4 class="roster-name" id="preview-leader-name">Leader Name</h4>
+                  <span class="roster-sub" id="preview-leader-details">leader@college.edu.in</span>
+                </div>
+              </div>
+
+              <!-- Dynamic Member Cards Container -->
+              <div class="members-list" id="dynamic-members-container">
+                <!-- Dynamically populated member cards will render here -->
+              </div>
+
+              <div class="member-actions-row">
+                <button type="button" class="btn btn-outline" id="btn-add-member">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  <span>Add Another Member (<span id="member-counter">1</span> / 3)</span>
+                </button>
+                <span class="member-limit-text">Min 1, Max 3 members permitted</span>
+              </div>
+
+              <span class="field-error" id="err-members-general"></span>
+
+              <div class="pane-footer">
+                <button type="button" class="btn btn-secondary" id="btn-back-step-3">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 12-7-7-7 7M12 19V5"/></svg>
+                  <span>Back</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-next-step-3">
+                  <span>Next: Review & Generate Pass</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 4: REVIEW & CONFIRMATION PASS -->
+            <div class="wizard-step-pane" id="pane-step-4">
+              <div class="pane-header">
+                <div class="pane-badge">04. Final Review</div>
+                <h3 class="pane-title">Verify Information & Submit</h3>
+                <p class="pane-desc">Double-check all entered information before generating your official registration pass.</p>
+              </div>
+
+              <!-- Summary Bento Table -->
+              <div class="review-bento" id="review-summary-bento">
+                <div class="review-grid">
+                  <div class="review-cell col-span-4">
+                    <span class="review-label">Team Name</span>
+                    <span class="review-val highlight" id="rev-team-name">—</span>
+                  </div>
+                  <div class="review-cell col-span-4">
+                    <span class="review-label">Project Title</span>
+                    <span class="review-val project-title-val" id="rev-project-title">—</span>
+                  </div>
+                  <div class="review-cell col-span-2">
+                    <span class="review-label">Leader Name & Email</span>
+                    <span class="review-val" id="rev-leader">—</span>
+                  </div>
+                  <div class="review-cell col-span-2">
+                    <span class="review-label">Department & Year</span>
+                    <span class="review-val" id="rev-dept-year">—</span>
+                  </div>
+                  <div class="review-cell col-span-4">
+                    <span class="review-label">Registered Squad Members</span>
+                    <div class="review-members-chips" id="rev-members-list">
+                      <!-- Chips will be generated here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Declaration & Code of Conduct Checkbox -->
+              <div class="agreement-box">
+                <label class="custom-checkbox-label">
+                  <input type="checkbox" id="accept-rules" required>
+                  <span class="checkbox-visual"></span>
+                  <span class="checkbox-text">
+                    I hereby certify that all project ideas, prototypes, and team details submitted are authentic and original work of our team. We agree to abide by the rules, code of conduct, and final verdicts of Project Expo 2K26.
+                  </span>
+                </label>
+                <span class="field-error" id="err-accept-rules"></span>
+              </div>
+
+              <div class="pane-footer">
+                <button type="button" class="btn btn-secondary" id="btn-back-step-4">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 12-7-7-7 7M12 19V5"/></svg>
+                  <span>Back</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-submit-glow" id="btn-submit-project">
+                  <span class="submit-icon">🚀</span>
+                  <span>Submit Project & Register</span>
+                </button>
+              </div>
+            </div>
+
+            
+            
+    </section>
+
+    
+
+    
+</main>
+
+  <!-- Mintlify-Inspired Minimalist Clean Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-icon">❖</span>
+          <span class="footer-title">PROJECT EXPO 2K26</span>
+        </div>
+        <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
+        <span class="footer-copyright">© 2026 Project Expo. Designed with Mintlify Aesthetic for Students & Creators.</span>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Navigation</span>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About & Vision</a>
+        <a href="/schedule.html">Event Schedule</a>
+        <a href="/guidelines.html">Rules & Rubric</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Portals</span>
+        <a href="/registration.html">Team Registration</a>
+        
+        <a href="/faq.html">FAQ Help Desk</a>
+        <a href="/contact.html">Campus Venue</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="f-col-title">Community</span>
+        <span class="f-subtext">Department of Technical Education</span>
+        <span class="f-subtext">Innovation & Incubation Cell</span>
+        <div class="social-pills">
+          <a href="#" class="social-pill" title="GitHub">GH</a>
+          <a href="#" class="social-pill" title="LinkedIn">IN</a>
+          <a href="#" class="social-pill" title="Instagram">IG</a>
+          <a href="#" class="social-pill" title="YouTube">YT</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
