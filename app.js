@@ -686,83 +686,231 @@ function _() {
   });
 }
 
-// ADMIN PORTAL & SUBMISSION LOGIC
+// SUPABASE POSTGRESQL CLOUD DATABASE CONFIGURATION
+const SUPABASE_CONFIG = {
+  url: "https://jyudxvoajuqypyotxzns.supabase.co",
+  key: "sb_publishable_YuEt7H6rc9SJhND6x_QRxA_Ae4VTOk-"
+};
+
+// Helper: Save registration to Supabase
+async function saveToSupabase(payload) {
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_CONFIG.key,
+        "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.warn("Supabase API responded with error:", res.status, errTxt);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Network error while connecting to Supabase:", err);
+    return false;
+  }
+}
+
+// Helper: Fetch all registrations from Supabase
+async function loadFromSupabase() {
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?select=*&order=created_at.desc`, {
+      headers: {
+        "apikey": SUPABASE_CONFIG.key,
+        "Authorization": `Bearer ${SUPABASE_CONFIG.key}`
+      }
+    });
+    if (!res.ok) {
+      console.warn("Could not fetch submissions from Supabase:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    return data.map(item => ({
+      teamName: item.team_name,
+      leaderName: item.leader_name,
+      leaderEmail: item.leader_email || "",
+      leaderPhone: item.leader_phone || "",
+      track: item.track || "Software Project",
+      projectTitle: item.project_title || "",
+      pptFileName: item.ppt_file_name || "N/A",
+      pptFileData: item.ppt_file_data || "",
+      github: item.github || "",
+      drive: item.drive || "",
+      createdAt: item.created_at
+    }));
+  } catch (err) {
+    console.error("Failed to load submissions from Supabase:", err);
+    return null;
+  }
+}
+
+// ADMIN PORTAL & SUBMISSION LOGIC (SUPABASE CLOUD CONNECTED)
 document.addEventListener("DOMContentLoaded", () => {
   // Submission Save Logic
   const btnSubmitProject = document.getElementById("btn-submit-project");
   if (btnSubmitProject) {
-    btnSubmitProject.addEventListener("click", () => {
-      const pptFile = document.getElementById("ppt-upload").files[0];
+    btnSubmitProject.addEventListener("click", async () => {
+      const pptInput = document.getElementById("ppt-upload");
+      const pptFile = pptInput && pptInput.files ? pptInput.files[0] : null;
       const githubUrl = document.getElementById("repo-link")?.value.trim() || "";
       const driveUrl = document.getElementById("demo-link")?.value.trim() || "";
       
-      if (!pptFile) {
-        alert("Please provide the PPT PDF.");
+      const teamName = document.getElementById("team-name")?.value.trim() || "Unknown Team";
+      const leaderName = document.getElementById("leader-name")?.value.trim() || "Unknown Leader";
+      const leaderEmail = document.getElementById("leader-email")?.value.trim() || "";
+      const leaderPhone = document.getElementById("leader-phone")?.value.trim() || "";
+      const leaderDept = document.getElementById("leader-dept")?.value.trim() || "";
+      const leaderYear = document.getElementById("leader-year")?.value.trim() || "";
+      const projectTitle = document.getElementById("project-title")?.value.trim() || "";
+      const track = document.querySelector('input[name="project_type"]:checked')?.value || "Software Project";
+
+      if (!pptFile && !driveUrl) {
+        alert("Please provide either your PPT PDF or a Google Drive / Demo link.");
         return;
       }
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
+
+      // Read squad members
+      const squad = [];
+      document.querySelectorAll("#dynamic-members-container .member-card-dynamic").forEach((b, idx) => {
+        const mName = b.querySelector(".member-name")?.value.trim() || `Member ${idx + 2}`;
+        const mRole = b.querySelector(".member-role")?.value.trim() || "Collaborator";
+        const mDept = b.querySelector(".member-dept")?.value || "";
+        squad.push({ name: mName, role: mRole, dept: mDept });
+      });
+
+      const originalBtnText = btnSubmitProject.innerHTML;
+      btnSubmitProject.disabled = true;
+      btnSubmitProject.innerHTML = '<span>Uploading & Registering... ⏳</span>';
+
+      const proceedSubmit = async (fileDataUrl) => {
         const teamData = {
-          teamName: document.getElementById("team-name")?.value.trim() || "Unknown Team",
-          leaderName: document.getElementById("leader-name")?.value.trim() || "Unknown Leader",
-          track: document.querySelector('input[name="project_type"]:checked')?.value || "Software Project",
-          pptFileName: pptFile.name,
-          pptFileData: e.target.result,
-          github: githubUrl,
+          teamName: teamName,
+          leaderName: leaderName,
+          leaderEmail: leaderEmail,
+          leaderPhone: leaderPhone,
+          track: track,
+          projectTitle: projectTitle,
+          pptFileName: pptFile ? pptFile.name : "Google Drive Linked",
+          pptFileData: fileDataUrl || "",
+          github: githubUrl || "N/A",
           drive: driveUrl || "N/A"
         };
-        
-        let submissions = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
-        submissions.push(teamData);
-        try {
-            localStorage.setItem("expoSubmissions", JSON.stringify(submissions));
-        } catch(err) {
-            alert("Warning: LocalStorage quota exceeded (files too large). Submission saved without file.");
-            delete teamData.pptFileData;
-            submissions.pop();
-            submissions.push(teamData);
-            localStorage.setItem("expoSubmissions", JSON.stringify(submissions));
+
+        const supabasePayload = {
+          team_name: teamName,
+          leader_name: leaderName,
+          leader_email: leaderEmail,
+          leader_phone: leaderPhone,
+          leader_dept: leaderDept,
+          leader_year: leaderYear,
+          members: squad,
+          project_title: projectTitle,
+          track: track,
+          ppt_file_name: pptFile ? pptFile.name : "Google Drive Linked",
+          ppt_file_data: (fileDataUrl && fileDataUrl.length < 500000) ? fileDataUrl : (pptFile ? `File: ${pptFile.name}` : "N/A"),
+          github: githubUrl || "N/A",
+          drive: driveUrl || "N/A"
+        };
+
+        // 1. Send to Supabase Cloud PostgreSQL
+        const savedCloud = await saveToSupabase(supabasePayload);
+        if (savedCloud) {
+          console.log("Registration successfully saved to Supabase PostgreSQL!");
+        } else {
+          console.warn("Supabase direct save failed (table might need creation), saving locally as backup.");
         }
-        
+
+        // 2. Local fallback / cache
+        try {
+          let submissions = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+          submissions.unshift(teamData);
+          localStorage.setItem("expoSubmissions", JSON.stringify(submissions));
+        } catch(err) {
+          console.warn("LocalStorage save skipped:", err);
+        }
+
+        btnSubmitProject.disabled = false;
+        btnSubmitProject.innerHTML = originalBtnText;
+
+        // 3. Show celebratory success screen
         showSuccessScreen(teamData.teamName, teamData.leaderName);
       };
-      reader.readAsDataURL(pptFile);
+
+      if (pptFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          proceedSubmit(e.target.result);
+        };
+        reader.onerror = function() {
+          proceedSubmit("");
+        };
+        reader.readAsDataURL(pptFile);
+      } else {
+        proceedSubmit("");
+      }
     });
   }
 
   // Admin Portal Login Logic
   const btnAdminLogin = document.getElementById("btn-admin-login");
   if (btnAdminLogin) {
-    btnAdminLogin.addEventListener("click", () => {
+    btnAdminLogin.addEventListener("click", async () => {
       const pass = document.getElementById("admin-password").value;
       if (pass === "admin123") {
         document.getElementById("admin-login-view").style.display = "none";
         document.getElementById("admin-dashboard-view").style.display = "block";
         document.getElementById("admin-dashboard-view").classList.remove("hidden");
         
-        // Populate table
         const tbody = document.getElementById("admin-table-body");
-        tbody.innerHTML = "";
-        let submissions = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+        tbody.innerHTML = '<tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--color-foreground-muted);">Fetching real-time registrations from Supabase Cloud Database... ⏳</td></tr>';
+
+        // Fetch from Supabase Cloud first
+        const cloudSubmissions = await loadFromSupabase();
+        let localSubmissions = [];
+        try {
+          localSubmissions = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+        } catch(e) {}
+
+        let submissions = [];
+        if (cloudSubmissions && cloudSubmissions.length > 0) {
+          submissions = cloudSubmissions;
+        } else if (cloudSubmissions && cloudSubmissions.length === 0) {
+          submissions = localSubmissions; // Fallback to local if table is empty
+        } else {
+          submissions = localSubmissions; // Network fallback
+        }
         
+        tbody.innerHTML = "";
         if (submissions.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--color-foreground-muted);">No submissions yet.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--color-foreground-muted);">No submissions yet. Register a team to see it here!</td></tr>';
           return;
         }
         
         submissions.forEach(sub => {
           const row = document.createElement("tr");
           row.style.borderBottom = "1px solid var(--color-border)";
+          const pptContent = (sub.pptFileData && sub.pptFileData.startsWith("data:"))
+            ? `<a href="${sub.pptFileData}" download="${sub.pptFileName}" style="color: var(--accent-color); text-decoration: underline;" title="Download PPT">${sub.pptFileName}</a>`
+            : `<span>${sub.pptFileName || "N/A"}</span>`;
+          
           row.innerHTML = `
             <td style="padding: 12px 16px; font-weight: 600;">${sub.teamName}</td>
-            <td style="padding: 12px 16px;">${sub.leaderName}</td>
+            <td style="padding: 12px 16px;">
+              <div>${sub.leaderName}</div>
+              ${sub.leaderPhone ? `<small style="color: var(--color-foreground-muted);">${sub.leaderPhone}</small>` : ""}
+            </td>
             <td style="padding: 12px 16px;">
               <span class="badge" style="background-color: var(--color-background-subtle); color: var(--accent-color); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                ${sub.track}
+                ${sub.track || "Software Project"}
               </span>
             </td>
-            <td style="padding: 12px 16px;">${sub.pptFileData ? `<a href="${sub.pptFileData}" download="${sub.pptFileName}" style="color: var(--accent-color); text-decoration: underline;" title="Download PPT">${sub.pptFileName}</a>` : sub.pptFileName}</td>
+            <td style="padding: 12px 16px;">${pptContent}</td>
             <td style="padding: 12px 16px;">${sub.github && sub.github !== "N/A" ? `<a href="${sub.github.startsWith('http') ? sub.github : 'https://' + sub.github}" target="_blank" style="color: var(--accent-color); text-decoration: underline;">View Code</a>` : "N/A"}</td>
             <td style="padding: 12px 16px;">${sub.drive && sub.drive !== "N/A" ? `<a href="${sub.drive.startsWith('http') ? sub.drive : 'https://' + sub.drive}" target="_blank" style="color: var(--accent-color); text-decoration: underline;">View Assets</a>` : "N/A"}</td>
           `;
