@@ -732,10 +732,14 @@ async function loadFromSupabase() {
     }
     const data = await res.json();
     return data.map(item => ({
+      id: item.id,
       teamName: item.team_name,
       leaderName: item.leader_name,
       leaderEmail: item.leader_email || "",
       leaderPhone: item.leader_phone || "",
+      leaderDept: item.leader_dept || "",
+      leaderYear: item.leader_year || "",
+      members: Array.isArray(item.members) ? item.members : [],
       track: item.track || "Software Project",
       projectTitle: item.project_title || "",
       pptFileName: item.ppt_file_name || "N/A",
@@ -749,6 +753,11 @@ async function loadFromSupabase() {
     return null;
   }
 }
+
+// Global dashboard state
+let adminSubmissions = [];
+let adminActiveFilter = "all";
+let adminSearchQuery = "";
 
 // ADMIN PORTAL & SUBMISSION LOGIC (SUPABASE CLOUD CONNECTED)
 document.addEventListener("DOMContentLoaded", () => {
@@ -765,8 +774,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const leaderName = document.getElementById("leader-name")?.value.trim() || "Unknown Leader";
       const leaderEmail = document.getElementById("leader-email")?.value.trim() || "";
       const leaderPhone = document.getElementById("leader-phone")?.value.trim() || "";
-      const leaderDept = document.getElementById("leader-dept")?.value.trim() || "";
-      const leaderYear = document.getElementById("leader-year")?.value.trim() || "";
+      const leaderDept = document.getElementById("leader-dept")?.value || "";
+      const leaderYear = document.getElementById("leader-year")?.value || "";
       const projectTitle = document.getElementById("project-title")?.value.trim() || "";
       const track = document.querySelector('input[name="project_type"]:checked')?.value || "Software Project";
 
@@ -786,7 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const originalBtnText = btnSubmitProject.innerHTML;
       btnSubmitProject.disabled = true;
-      btnSubmitProject.innerHTML = '<span>Uploading & Registering... ⏳</span>';
+      btnSubmitProject.innerHTML = '<span>Uploading Slide Deck & Registering... ⏳</span>';
 
       const proceedSubmit = async (fileDataUrl) => {
         const teamData = {
@@ -794,6 +803,9 @@ document.addEventListener("DOMContentLoaded", () => {
           leaderName: leaderName,
           leaderEmail: leaderEmail,
           leaderPhone: leaderPhone,
+          leaderDept: leaderDept,
+          leaderYear: leaderYear,
+          members: squad,
           track: track,
           projectTitle: projectTitle,
           pptFileName: pptFile ? pptFile.name : "Google Drive Linked",
@@ -802,6 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
           drive: driveUrl || "N/A"
         };
 
+        // Full cloud payload: NO 500k byte truncation so every PDF is downloadable!
         const supabasePayload = {
           team_name: teamName,
           leader_name: leaderName,
@@ -812,8 +825,8 @@ document.addEventListener("DOMContentLoaded", () => {
           members: squad,
           project_title: projectTitle,
           track: track,
-          ppt_file_name: pptFile ? pptFile.name : "Google Drive Linked",
-          ppt_file_data: (fileDataUrl && fileDataUrl.length < 500000) ? fileDataUrl : (pptFile ? `File: ${pptFile.name}` : "N/A"),
+          ppt_file_name: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
+          ppt_file_data: fileDataUrl || "",
           github: githubUrl || "N/A",
           drive: driveUrl || "N/A"
         };
@@ -823,7 +836,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (savedCloud) {
           console.log("Registration successfully saved to Supabase PostgreSQL!");
         } else {
-          console.warn("Supabase direct save failed (table might need creation), saving locally as backup.");
+          console.warn("Supabase direct save failed, saving locally as backup.");
         }
 
         // 2. Local fallback / cache
@@ -857,6 +870,350 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Render Admin Dashboard Table & Live Stats
+  function updateDashboardView() {
+    const totalTeamsEl = document.getElementById("stat-total-teams");
+    const softwareTeamsEl = document.getElementById("stat-software-teams");
+    const hardwareTeamsEl = document.getElementById("stat-hardware-teams");
+    const totalMembersEl = document.getElementById("stat-total-members");
+
+    const filterAllEl = document.getElementById("filter-count-all");
+    const filterSoftEl = document.getElementById("filter-count-software");
+    const filterHardEl = document.getElementById("filter-count-hardware");
+
+    const tbody = document.getElementById("admin-table-body");
+    if (!tbody) return;
+
+    // Calculate metrics
+    const total = adminSubmissions.length;
+    const softwareCount = adminSubmissions.filter(s => (s.track || "").toLowerCase().includes("software")).length;
+    const hardwareCount = adminSubmissions.filter(s => (s.track || "").toLowerCase().includes("hardware")).length;
+    
+    let totalParticipants = 0;
+    adminSubmissions.forEach(s => {
+      // 1 Leader + squad members
+      totalParticipants += 1 + (Array.isArray(s.members) ? s.members.length : 0);
+    });
+
+    if (totalTeamsEl) totalTeamsEl.textContent = total;
+    if (softwareTeamsEl) softwareTeamsEl.textContent = softwareCount;
+    if (hardwareTeamsEl) hardwareTeamsEl.textContent = hardwareCount;
+    if (totalMembersEl) totalMembersEl.textContent = totalParticipants;
+
+    if (filterAllEl) filterAllEl.textContent = total;
+    if (filterSoftEl) filterSoftEl.textContent = softwareCount;
+    if (filterHardEl) filterHardEl.textContent = hardwareCount;
+
+    // Apply Filter & Search
+    let filtered = adminSubmissions.filter(s => {
+      // Track filter
+      if (adminActiveFilter === "software" && !(s.track || "").toLowerCase().includes("software")) return false;
+      if (adminActiveFilter === "hardware" && !(s.track || "").toLowerCase().includes("hardware")) return false;
+
+      // Search filter
+      if (adminSearchQuery) {
+        const q = adminSearchQuery.toLowerCase();
+        const tName = (s.teamName || "").toLowerCase();
+        const lName = (s.leaderName || "").toLowerCase();
+        const pTitle = (s.projectTitle || "").toLowerCase();
+        const phone = (s.leaderPhone || "").toLowerCase();
+        if (!tName.includes(q) && !lName.includes(q) && !pTitle.includes(q) && !phone.includes(q)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    tbody.innerHTML = "";
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="padding: 40px 20px; text-align: center; color: var(--color-foreground-muted);">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+            <div style="font-weight: 600; font-size: 1.05rem; color: var(--color-foreground-main);">No matching registrations found</div>
+            <p style="font-size: 0.85rem; margin-top: 4px;">Try modifying your search keywords or filter pills.</p>
+          </td>
+        </tr>`;
+      return;
+    }
+
+    filtered.forEach((sub, idx) => {
+      const row = document.createElement("tr");
+      
+      // Initials for avatar
+      const initials = (sub.teamName || "PE")
+        .split(" ")
+        .map(w => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+
+      // Track Badge
+      const isSoftware = (sub.track || "").toLowerCase().includes("software");
+      const trackBadge = isSoftware 
+        ? `<span class="badge-software">● Software Project</span>`
+        : `<span class="badge-hardware">● Hardware Project</span>`;
+
+      // PPT Download Button / Link
+      let pptHtml = "";
+      if (sub.pptFileData && sub.pptFileData.startsWith("data:")) {
+        pptHtml = `
+          <a href="${sub.pptFileData}" download="${sub.pptFileName || 'Presentation.pdf'}" class="btn-ppt-download" title="Click to download ${sub.pptFileName}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download PDF</span>
+          </a>`;
+      } else if (sub.drive && sub.drive !== "N/A" && sub.drive.startsWith("http")) {
+        pptHtml = `
+          <a href="${sub.drive}" target="_blank" class="btn-ppt-download" style="background:#04547c;" title="Open in Google Drive">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open Drive File</span>
+          </a>`;
+      } else {
+        pptHtml = `<span class="btn-ppt-missing" title="${sub.pptFileName || 'No file'}">📄 ${sub.pptFileName || 'N/A'}</span>`;
+      }
+
+      // External Links (GitHub & Drive)
+      const links = [];
+      if (sub.github && sub.github !== "N/A") {
+        const ghUrl = sub.github.startsWith("http") ? sub.github : "https://" + sub.github;
+        links.push(`<a href="${ghUrl}" target="_blank" class="btn-link-pill" title="GitHub Repository">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>`);
+      }
+      if (sub.drive && sub.drive !== "N/A") {
+        const drUrl = sub.drive.startsWith("http") ? sub.drive : "https://" + sub.drive;
+        links.push(`<a href="${drUrl}" target="_blank" class="btn-link-pill" title="Live Assets / Demo">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Demo</span>
+        </a>`);
+      }
+      const linksHtml = links.length > 0 ? `<div style="display:flex; gap:6px; flex-wrap:wrap;">${links.join("")}</div>` : `<span style="color:var(--color-foreground-muted); font-size:0.8rem;">—</span>`;
+
+      // Phone display
+      const cleanPhone = (sub.leaderPhone || "").replace(/\D/g, "");
+      const phoneHtml = sub.leaderPhone 
+        ? `<a href="https://wa.me/91${cleanPhone}" target="_blank" class="leader-phone-link" title="Chat on WhatsApp">
+            <span>💬 ${sub.leaderPhone}</span>
+           </a>`
+        : "";
+
+      const memberCount = (Array.isArray(sub.members) ? sub.members.length : 0) + 1;
+
+      row.innerHTML = `
+        <td style="color: var(--color-foreground-muted); font-weight: 600;">${idx + 1}</td>
+        <td>
+          <div class="team-cell">
+            <div class="team-avatar-pill">${initials}</div>
+            <div class="team-info-block">
+              <span class="team-name-title">${sub.teamName}</span>
+              <span class="team-project-sub" title="${sub.projectTitle || 'Innovation Project'}">${sub.projectTitle || 'General Innovation'}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="leader-name-text">${sub.leaderName}</div>
+          <div class="leader-contact-sub">${sub.leaderEmail || phoneHtml}</div>
+          ${sub.leaderEmail && phoneHtml ? `<div class="leader-contact-sub">${phoneHtml}</div>` : ""}
+        </td>
+        <td>${trackBadge}</td>
+        <td>${pptHtml}</td>
+        <td>${linksHtml}</td>
+        <td style="text-align: right;">
+          <button type="button" class="btn-squad-view" data-index="${idx}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Roster (${memberCount})</span>
+          </button>
+        </td>
+      `;
+
+      // Attach modal opener
+      const squadBtn = row.querySelector(".btn-squad-view");
+      if (squadBtn) {
+        squadBtn.addEventListener("click", () => openSquadModal(sub));
+      }
+
+      tbody.appendChild(row);
+    });
+  }
+
+  // Open Squad Details Modal
+  function openSquadModal(sub) {
+    const modalBackdrop = document.getElementById("squad-modal-backdrop");
+    const modalTitle = document.getElementById("modal-team-title");
+    const modalSubtitle = document.getElementById("modal-team-subtitle");
+    const modalBody = document.getElementById("modal-body-container");
+
+    if (!modalBackdrop || !modalBody) return;
+
+    modalTitle.textContent = `${sub.teamName} — Roster & Project`;
+    modalSubtitle.textContent = `Track: ${sub.track || "Software Project"} • Registered: ${sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "Active"}`;
+
+    const members = Array.isArray(sub.members) ? sub.members : [];
+
+    let membersListHtml = "";
+    if (members.length === 0) {
+      membersListHtml = `<p style="font-size:0.85rem; color:var(--color-foreground-muted); margin:0;">Solo registered team (No additional collaborators logged).</p>`;
+    } else {
+      membersListHtml = members.map((m, i) => `
+        <div class="modal-member-item">
+          <div class="modal-member-avatar">#${i + 2}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.92rem; color:var(--color-foreground-main);">${m.name || `Member ${i + 2}`}</div>
+            <div style="font-size:0.78rem; color:var(--color-foreground-tertiary);">${m.role || 'Collaborator'} • ${m.dept || 'Engineering'}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    modalBody.innerHTML = `
+      <!-- Project Concept Box -->
+      <div class="modal-section-box">
+        <div class="modal-section-title">💡 Project Overview</div>
+        <div class="modal-detail-val" style="font-size: 1.05rem; margin-bottom: 4px;">${sub.projectTitle || "Not specified"}</div>
+        <div style="font-size: 0.85rem; color: var(--color-foreground-tertiary);">Track: ${sub.track || "Software Project"}</div>
+      </div>
+
+      <!-- Team Leader Box -->
+      <div class="modal-section-box">
+        <div class="modal-section-title">👑 Team Leader Details</div>
+        <div class="modal-grid-2">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Full Name</span>
+            <span class="modal-detail-val">${sub.leaderName}</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">WhatsApp Contact</span>
+            <span class="modal-detail-val">${sub.leaderPhone || "N/A"}</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Email Address</span>
+            <span class="modal-detail-val">${sub.leaderEmail || "N/A"}</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Department & Year</span>
+            <span class="modal-detail-val">${sub.leaderDept || ""} ${sub.leaderYear ? "• " + sub.leaderYear : ""}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Squad Collaborators Box -->
+      <div class="modal-section-box">
+        <div class="modal-section-title">👥 Squad Collaborators (${members.length})</div>
+        ${membersListHtml}
+      </div>
+
+      <!-- Materials Box -->
+      <div class="modal-section-box">
+        <div class="modal-section-title">📦 Submission Assets</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+          ${sub.pptFileData && sub.pptFileData.startsWith("data:") 
+            ? `<a href="${sub.pptFileData}" download="${sub.pptFileName || 'Presentation.pdf'}" class="btn-ppt-download">📥 Download ${sub.pptFileName || 'Slide Deck'}</a>` 
+            : `<span class="btn-ppt-missing">📄 ${sub.pptFileName || 'No PPT File'}</span>`}
+          ${sub.github && sub.github !== "N/A" 
+            ? `<a href="${sub.github.startsWith('http') ? sub.github : 'https://' + sub.github}" target="_blank" class="btn-link-pill">💻 GitHub Repository</a>` 
+            : ""}
+          ${sub.drive && sub.drive !== "N/A" 
+            ? `<a href="${sub.drive.startsWith('http') ? sub.drive : 'https://' + sub.drive}" target="_blank" class="btn-link-pill">🌐 Demo / Assets Link</a>` 
+            : ""}
+        </div>
+      </div>
+    `;
+
+    modalBackdrop.classList.add("open");
+  }
+
+  // Close Squad Modal
+  const btnCloseModal = document.getElementById("btn-close-modal");
+  const modalBackdrop = document.getElementById("squad-modal-backdrop");
+  if (btnCloseModal && modalBackdrop) {
+    btnCloseModal.addEventListener("click", () => modalBackdrop.classList.remove("open"));
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) modalBackdrop.classList.remove("open");
+    });
+  }
+
+  // Export to CSV Function
+  function exportSubmissionsCSV() {
+    if (!adminSubmissions || adminSubmissions.length === 0) {
+      alert("No submissions available to export.");
+      return;
+    }
+
+    const headers = [
+      "Team Name",
+      "Leader Name",
+      "Leader Phone",
+      "Leader Email",
+      "Department",
+      "Academic Year",
+      "Track",
+      "Project Title",
+      "Squad Members",
+      "Slide Deck File",
+      "GitHub Repo",
+      "Drive Demo URL",
+      "Submitted At"
+    ];
+
+    const rows = adminSubmissions.map(s => {
+      const squadNames = Array.isArray(s.members) 
+        ? s.members.map(m => `${m.name} (${m.role})`).join("; ") 
+        : "";
+      
+      return [
+        `"${(s.teamName || "").replace(/"/g, '""')}"`,
+        `"${(s.leaderName || "").replace(/"/g, '""')}"`,
+        `"${(s.leaderPhone || "").replace(/"/g, '""')}"`,
+        `"${(s.leaderEmail || "").replace(/"/g, '""')}"`,
+        `"${(s.leaderDept || "").replace(/"/g, '""')}"`,
+        `"${(s.leaderYear || "").replace(/"/g, '""')}"`,
+        `"${(s.track || "").replace(/"/g, '""')}"`,
+        `"${(s.projectTitle || "").replace(/"/g, '""')}"`,
+        `"${squadNames.replace(/"/g, '""')}"`,
+        `"${(s.pptFileName || "").replace(/"/g, '""')}"`,
+        `"${(s.github || "").replace(/"/g, '""')}"`,
+        `"${(s.drive || "").replace(/"/g, '""')}"`,
+        `"${s.createdAt || ""}"`
+      ].join(",");
+    });
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Project_Expo_2K26_Registrations_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Load and refresh handler
+  async function fetchAndPopulateAdminData() {
+    const tbody = document.getElementById("admin-table-body");
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding: 32px; text-align: center; color: var(--color-foreground-muted);"><span class="cloud-pulse-dot" style="display:inline-block; margin-right:8px;"></span> Syncing real-time registrations from Supabase Cloud... ⏳</td></tr>';
+    }
+
+    const cloudData = await loadFromSupabase();
+    let localData = [];
+    try {
+      localData = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+    } catch(e) {}
+
+    if (cloudData && cloudData.length > 0) {
+      adminSubmissions = cloudData;
+    } else if (cloudData && cloudData.length === 0 && localData.length > 0) {
+      adminSubmissions = localData;
+    } else if (cloudData) {
+      adminSubmissions = [];
+    } else {
+      adminSubmissions = localData;
+    }
+
+    updateDashboardView();
+  }
+
   // Admin Portal Login Logic
   const btnAdminLogin = document.getElementById("btn-admin-login");
   if (btnAdminLogin) {
@@ -867,55 +1224,47 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("admin-dashboard-view").style.display = "block";
         document.getElementById("admin-dashboard-view").classList.remove("hidden");
         
-        const tbody = document.getElementById("admin-table-body");
-        tbody.innerHTML = '<tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--color-foreground-muted);">Fetching real-time registrations from Supabase Cloud Database... ⏳</td></tr>';
+        await fetchAndPopulateAdminData();
 
-        // Fetch from Supabase Cloud first
-        const cloudSubmissions = await loadFromSupabase();
-        let localSubmissions = [];
-        try {
-          localSubmissions = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
-        } catch(e) {}
+        // Search listener
+        const searchInput = document.getElementById("admin-search-input");
+        if (searchInput) {
+          searchInput.addEventListener("input", (e) => {
+            adminSearchQuery = e.target.value.trim();
+            updateDashboardView();
+          });
+        }
 
-        let submissions = [];
-        if (cloudSubmissions && cloudSubmissions.length > 0) {
-          submissions = cloudSubmissions;
-        } else if (cloudSubmissions && cloudSubmissions.length === 0) {
-          submissions = localSubmissions; // Fallback to local if table is empty
-        } else {
-          submissions = localSubmissions; // Network fallback
-        }
-        
-        tbody.innerHTML = "";
-        if (submissions.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--color-foreground-muted);">No submissions yet. Register a team to see it here!</td></tr>';
-          return;
-        }
-        
-        submissions.forEach(sub => {
-          const row = document.createElement("tr");
-          row.style.borderBottom = "1px solid var(--color-border)";
-          const pptContent = (sub.pptFileData && sub.pptFileData.startsWith("data:"))
-            ? `<a href="${sub.pptFileData}" download="${sub.pptFileName}" style="color: var(--accent-color); text-decoration: underline;" title="Download PPT">${sub.pptFileName}</a>`
-            : `<span>${sub.pptFileName || "N/A"}</span>`;
-          
-          row.innerHTML = `
-            <td style="padding: 12px 16px; font-weight: 600;">${sub.teamName}</td>
-            <td style="padding: 12px 16px;">
-              <div>${sub.leaderName}</div>
-              ${sub.leaderPhone ? `<small style="color: var(--color-foreground-muted);">${sub.leaderPhone}</small>` : ""}
-            </td>
-            <td style="padding: 12px 16px;">
-              <span class="badge" style="background-color: var(--color-background-subtle); color: var(--accent-color); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                ${sub.track || "Software Project"}
-              </span>
-            </td>
-            <td style="padding: 12px 16px;">${pptContent}</td>
-            <td style="padding: 12px 16px;">${sub.github && sub.github !== "N/A" ? `<a href="${sub.github.startsWith('http') ? sub.github : 'https://' + sub.github}" target="_blank" style="color: var(--accent-color); text-decoration: underline;">View Code</a>` : "N/A"}</td>
-            <td style="padding: 12px 16px;">${sub.drive && sub.drive !== "N/A" ? `<a href="${sub.drive.startsWith('http') ? sub.drive : 'https://' + sub.drive}" target="_blank" style="color: var(--accent-color); text-decoration: underline;">View Assets</a>` : "N/A"}</td>
-          `;
-          tbody.appendChild(row);
+        // Filter buttons
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            adminActiveFilter = btn.getAttribute("data-filter") || "all";
+            updateDashboardView();
+          });
         });
+
+        // Refresh button
+        const btnRefresh = document.getElementById("btn-admin-refresh");
+        if (btnRefresh) {
+          btnRefresh.addEventListener("click", async () => {
+            btnRefresh.disabled = true;
+            btnRefresh.innerHTML = `<span>Syncing... ⏳</span>`;
+            await fetchAndPopulateAdminData();
+            btnRefresh.disabled = false;
+            btnRefresh.innerHTML = `
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.4L3 16M3 21v-5h5"/></svg>
+              <span>Refresh</span>`;
+          });
+        }
+
+        // Export CSV button
+        const btnExport = document.getElementById("btn-admin-export");
+        if (btnExport) {
+          btnExport.addEventListener("click", exportSubmissionsCSV);
+        }
+
       } else {
         const err = document.getElementById("err-admin-login");
         err.textContent = "Incorrect password.";

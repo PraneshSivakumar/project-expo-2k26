@@ -49,31 +49,130 @@
       </div>
     </section>
 
-    <section class="section-container hidden" style="min-height: 80vh; display: none;" id="admin-dashboard-view">
-      <div class="container" style="max-width: 1200px;">
-        <div class="section-header">
-          <h2 class="section-title">Project Submissions Dashboard</h2>
-          <p class="section-subtitle">Real-time repository of all finalized team registrations and assets.</p>
+    <section class="section-container hidden" style="min-height: 85vh; display: none; padding-top: 40px; padding-bottom: 80px;" id="admin-dashboard-view">
+      <div class="container" style="max-width: 1320px;">
+        
+        <!-- Header & Cloud Indicator -->
+        <div class="admin-header-strip">
+          <div>
+            <div class="section-eyebrow">06. EXECUTIVE CONSOLE</div>
+            <h1 class="section-title" style="font-size: 2.2rem; margin-top: 4px; margin-bottom: 6px;">
+              Project Submissions <span class="editorial-accent">Dashboard</span>
+            </h1>
+            <p class="section-subtitle" style="margin-bottom: 0;">
+              Real-time cloud repository of verified teams, slide decks, and project repositories.
+            </p>
+          </div>
+          <div class="admin-cloud-badge">
+            <span class="cloud-pulse-dot"></span>
+            <span>Supabase PostgreSQL Cloud • Connected</span>
+          </div>
         </div>
-        <div class="bento-card" style="padding: 20px; overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+
+        <!-- 4-Card Live Stats Bento Grid -->
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total Teams</span>
+              <span class="stat-icon">👥</span>
+            </div>
+            <div class="stat-number" id="stat-total-teams">0</div>
+            <div class="stat-subtext">Verified team registrations</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Software Projects</span>
+              <span class="stat-icon">💻</span>
+            </div>
+            <div class="stat-number" id="stat-software-teams">0</div>
+            <div class="stat-subtext">AI, Web, Mobile & Cloud tracks</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Hardware Projects</span>
+              <span class="stat-icon">⚙️</span>
+            </div>
+            <div class="stat-number" id="stat-hardware-teams">0</div>
+            <div class="stat-subtext">IoT, Robotics & Embedded tracks</div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Total Participants</span>
+              <span class="stat-icon">🎓</span>
+            </div>
+            <div class="stat-number" id="stat-total-members">0</div>
+            <div class="stat-subtext">Students & collaborators registered</div>
+          </div>
+        </div>
+
+        <!-- Toolbar: Search, Filters, Refresh, and Export -->
+        <div class="admin-toolbar">
+          <div class="admin-search-wrapper">
+            <svg class="admin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input type="text" id="admin-search-input" class="admin-search-input" placeholder="Search teams, leaders, or project titles...">
+          </div>
+
+          <div class="admin-filters-group">
+            <button type="button" class="filter-btn active" data-filter="all" id="filter-all">All (<span id="filter-count-all">0</span>)</button>
+            <button type="button" class="filter-btn" data-filter="software" id="filter-software">Software (<span id="filter-count-software">0</span>)</button>
+            <button type="button" class="filter-btn" data-filter="hardware" id="filter-hardware">Hardware (<span id="filter-count-hardware">0</span>)</button>
+          </div>
+
+          <div class="admin-actions-group">
+            <button type="button" class="btn-admin-action btn-admin-refresh" id="btn-admin-refresh">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15.5-6.4L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.4L3 16M3 21v-5h5"/></svg>
+              <span>Refresh</span>
+            </button>
+            <button type="button" class="btn-admin-action btn-admin-export" id="btn-admin-export">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modern Table Card -->
+        <div class="admin-table-card" style="overflow-x: auto;">
+          <table class="admin-table">
             <thead>
-              <tr style="border-bottom: 2px solid var(--color-border); color: var(--color-foreground-muted);">
-                <th style="padding: 12px 16px;">Team Name</th>
-                <th style="padding: 12px 16px;">Leader</th>
-                <th style="padding: 12px 16px;">Project Type</th>
-                <th style="padding: 12px 16px;">PPT (File)</th>
-                <th style="padding: 12px 16px;">GitHub URL</th>
-                <th style="padding: 12px 16px;">Drive URL</th>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Team & Concept</th>
+                <th>Team Leader</th>
+                <th>Track</th>
+                <th>PPT Slide Deck</th>
+                <th>External Links</th>
+                <th style="text-align: right;">Roster</th>
               </tr>
             </thead>
             <tbody id="admin-table-body">
-              <!-- Dynamically populated rows will go here -->
+              <!-- Dynamically populated rows -->
             </tbody>
           </table>
         </div>
+
       </div>
     </section>
+
+    <!-- Squad Details Modal -->
+    <div class="admin-modal-backdrop" id="squad-modal-backdrop">
+      <div class="admin-modal-card">
+        <div class="modal-header-strip">
+          <div>
+            <h3 class="modal-title" id="modal-team-title">Team Squad Roster</h3>
+            <p class="modal-subtitle" id="modal-team-subtitle">Registered participants and submission materials</p>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-close-modal">✕</button>
+        </div>
+        <div class="modal-body-content" id="modal-body-container">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
   </main>
 
 <footer class="footer">
