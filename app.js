@@ -725,8 +725,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("expoSubmissions", JSON.stringify(submissions));
         }
         
-        alert("Project submitted successfully! Registration complete.");
-        window.location.href = "index.html";
+        showSuccessScreen(teamData.teamName, teamData.leaderName);
       };
       reader.readAsDataURL(pptFile);
     });
@@ -807,3 +806,147 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ==========================================
+// 🎉 SUCCESS SCREEN WITH CONFETTI
+// ==========================================
+function showSuccessScreen(teamName, leaderName) {
+  const overlay = document.createElement("div");
+  overlay.id = "success-overlay";
+  overlay.innerHTML = `
+    <style>
+      #success-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(8px);
+        animation: fadeInOverlay 0.4s ease;
+      }
+      @keyframes fadeInOverlay {
+        from { opacity: 0; } to { opacity: 1; }
+      }
+      .success-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 48px 40px;
+        text-align: center;
+        max-width: 480px;
+        width: 90%;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      @keyframes scaleIn {
+        from { transform: scale(0.5); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .success-check {
+        width: 80px; height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #12ac76, #0d8c5f);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 24px;
+        animation: bounceIn 0.6s ease 0.3s both;
+        box-shadow: 0 8px 24px rgba(18, 172, 118, 0.35);
+      }
+      @keyframes bounceIn {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+      .success-check svg { width: 40px; height: 40px; color: #fff; }
+      .success-title {
+        font-size: 1.8rem; font-weight: 700;
+        color: #1a1a2e; margin-bottom: 8px;
+        font-family: 'Inter', sans-serif;
+      }
+      .success-team {
+        font-size: 1.1rem; color: #12ac76; font-weight: 600;
+        margin-bottom: 16px;
+      }
+      .success-msg {
+        font-size: 0.95rem; color: #6b7280;
+        line-height: 1.6; margin-bottom: 28px;
+      }
+      .success-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 28px;
+        background: linear-gradient(135deg, #12ac76, #0d8c5f);
+        color: #fff; border: none; border-radius: 10px;
+        font-size: 1rem; font-weight: 600;
+        cursor: pointer; text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(18, 172, 118, 0.3);
+      }
+      .success-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(18, 172, 118, 0.4);
+      }
+      .success-timer {
+        font-size: 0.8rem; color: #9ca3af; margin-top: 16px;
+      }
+      .confetti-piece {
+        position: fixed;
+        width: 10px; height: 10px;
+        z-index: 100000;
+        animation: confettiFall linear forwards;
+        pointer-events: none;
+      }
+      @keyframes confettiFall {
+        0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+      }
+    </style>
+
+    <div class="success-card">
+      <div class="success-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <div class="success-title">Registration Complete! 🎉</div>
+      <div class="success-team">Team "${teamName}"</div>
+      <div class="success-msg">
+        Your project has been successfully registered for<br>
+        <strong>Project Expo 2K26</strong>.<br>
+        The organizing committee will review your submission shortly.
+      </div>
+      <a href="/index.html" class="success-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Home
+      </a>
+      <div class="success-timer">Redirecting in <span id="countdown-timer">8</span>s...</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Confetti burst
+  const colors = ["#12ac76","#f59e0b","#ef4444","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (Math.random() * 8 + 6) + "px";
+    piece.style.height = (Math.random() * 8 + 6) + "px";
+    piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+    piece.style.animationDuration = (Math.random() * 2 + 2) + "s";
+    piece.style.animationDelay = (Math.random() * 1) + "s";
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+
+  // Countdown redirect
+  let sec = 8;
+  const timer = setInterval(() => {
+    sec--;
+    const el = document.getElementById("countdown-timer");
+    if (el) el.textContent = sec;
+    if (sec <= 0) { clearInterval(timer); window.location.href = "/index.html"; }
+  }, 1000);
+}
