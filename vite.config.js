@@ -1,7 +1,23 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 import { sendRegistrationConfirmation } from './mailer.js';
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        about: resolve(__dirname, 'about.html'),
+        guidelines: resolve(__dirname, 'guidelines.html'),
+        schedule: resolve(__dirname, 'schedule.html'),
+        registration: resolve(__dirname, 'registration.html'),
+        faq: resolve(__dirname, 'faq.html'),
+        contact: resolve(__dirname, 'contact.html'),
+        admin: resolve(__dirname, 'admin.html'),
+        emailPreview: resolve(__dirname, 'email-preview.html')
+      }
+    }
+  },
   plugins: [
     {
       name: 'api-email-server',

@@ -6,10 +6,14 @@
   "scripts": {
     "dev": "vite --port 5173 --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemailer": "^10.0.10"
   },
   "devDependencies": {
-    "nodemailer": "^10.0.10",
     "vite": "^6.2.0"
   }
 }
