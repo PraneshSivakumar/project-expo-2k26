@@ -3527,54 +3527,8 @@ input[type="file"] {
 }
 
 /* Horizontal Quick-Swipe Nav Strip for Mobile (Visible under sticky nav) */
-.mobile-quick-scroll-strip {
-  display: none;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 8px 16px;
-  background: rgba(254, 253, 251, 0.96);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  position: sticky;
-  top: 57px;
-  z-index: 999;
-}
-
-.mobile-quick-scroll-strip::-webkit-scrollbar {
-  display: none;
-}
-
-.quick-strip-link {
-  display: inline-block;
-  padding: 6px 13px;
-  border-radius: var(--radius-pill);
-  color: var(--color-foreground-secondary);
-  text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 500;
-  background: #faf8f5;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  margin-right: 6px;
-  transition: all 0.15s ease;
-}
-
-.quick-strip-link:last-child {
-  margin-right: 0;
-}
-
-.quick-strip-link.active {
-  background: #0c8c5e;
-  color: #ffffff;
-  border-color: #0c8c5e;
-  font-weight: 600;
-}
-
 @media (max-width: 768px) {
   .mobile-nav-toggle {
-    display: flex;
-  }
-  .mobile-quick-scroll-strip {
     display: flex;
   }
   .nav-container {

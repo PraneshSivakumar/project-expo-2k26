@@ -1574,27 +1574,8 @@ function setupMobileNav() {
     closeBtn?.addEventListener("click", closeDrawer);
     backdrop.addEventListener("click", closeDrawer);
   }
-
-  // 3. Add Horizontal Quick-Swipe Nav Strip (Matching user's photo!)
-  if (!document.getElementById("mobile-quick-nav-strip")) {
-    const strip = document.createElement("nav");
-    strip.className = "mobile-quick-scroll-strip";
-    strip.id = "mobile-quick-nav-strip";
-
-    const stripLinks = navItems.filter(item => item.title !== "Admin").map(item => {
-      const isActive = currentPath === item.href.toLowerCase() || 
-        (item.href === "/index.html" && (currentPath === "/" || currentPath.endsWith("index.html") || currentPath === ""));
-      return `
-        <a href="${item.href}" class="quick-strip-link ${isActive ? 'active' : ''}">
-          ${item.title}
-        </a>
-      `;
-    }).join("");
-
-    strip.innerHTML = stripLinks;
-    stickyNav.insertAdjacentElement("afterend", strip);
-  }
 }
 
 document.addEventListener("DOMContentLoaded", setupMobileNav);
+
 
