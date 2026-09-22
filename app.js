@@ -1471,7 +1471,7 @@ function setupMobileNav() {
     { title: "Admin", href: "/admin.html", icon: "🔒" }
   ];
 
-  // 1. Add Hamburger button to header if not present
+  // 1. Add Hamburger button on LEFT side next to Project Expo logo
   if (!document.getElementById("btn-mobile-nav-toggle")) {
     const hamburgerBtn = document.createElement("button");
     hamburgerBtn.type = "button";
@@ -1484,11 +1484,23 @@ function setupMobileNav() {
       <span class="hamburger-line"></span>
     `;
 
-    const navActions = navContainer.querySelector(".nav-actions");
-    if (navActions) {
-      navActions.appendChild(hamburgerBtn);
+    const brandLogo = navContainer.querySelector(".brand-logo");
+    if (brandLogo) {
+      let leftGroup = navContainer.querySelector(".nav-left-brand-group");
+      if (!leftGroup) {
+        leftGroup = document.createElement("div");
+        leftGroup.className = "nav-left-brand-group";
+        leftGroup.style.display = "inline-flex";
+        leftGroup.style.alignItems = "center";
+        leftGroup.style.gap = "8px";
+        brandLogo.parentNode.insertBefore(leftGroup, brandLogo);
+        leftGroup.appendChild(hamburgerBtn);
+        leftGroup.appendChild(brandLogo);
+      } else {
+        leftGroup.prepend(hamburgerBtn);
+      }
     } else {
-      navContainer.appendChild(hamburgerBtn);
+      navContainer.prepend(hamburgerBtn);
     }
   }
 
