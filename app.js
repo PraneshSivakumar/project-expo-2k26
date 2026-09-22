@@ -1069,7 +1069,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 3. Automated Confirmation Email via Brevo SMTP
         try {
-          fetch("/api/send-confirmation", {
+          const mailRes = await fetch("/api/send-confirmation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1084,11 +1084,9 @@ document.addEventListener("DOMContentLoaded", () => {
               pptFileName: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
               members: squad
             })
-          }).then(r => r.json()).then(res => {
-            console.log("[Brevo Email Sent]:", res);
-          }).catch(err => {
-            console.warn("[Email Dispatch Notice]:", err);
           });
+          const mailJson = await mailRes.json();
+          console.log("[Brevo Email Sent]:", mailJson);
         } catch(mailErr) {
           console.warn("Could not trigger confirmation email:", mailErr);
         }
