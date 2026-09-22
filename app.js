@@ -719,7 +719,7 @@ async function saveToSupabase(payload) {
   }
 }
 
-// Helper: Fetch all registrations from Supabase
+// Helper: Fetch all registrations from Supabase (with system tombstone filtering)
 async function loadFromSupabase() {
   try {
     const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?select=*&order=created_at.desc`, {
@@ -733,7 +733,44 @@ async function loadFromSupabase() {
       return null;
     }
     const data = await res.json();
-    return data.map(item => ({
+    
+    // Check for clear-all reset timestamp and deleted team identifiers
+    let latestClearTime = 0;
+    const deletedTeamIds = new Set();
+    const deletedTeamNames = new Set();
+
+    try {
+      const localClearTime = parseInt(localStorage.getItem("expo_cleared_timestamp") || "0", 10);
+      if (localClearTime > latestClearTime) latestClearTime = localClearTime;
+      const localDeleted = JSON.parse(localStorage.getItem("expo_deleted_team_ids") || "[]");
+      localDeleted.forEach(id => deletedTeamIds.add(id));
+    } catch(e) {}
+
+    data.forEach(item => {
+      const name = item.team_name || "";
+      if (name === "__SYSTEM_DELETED_ALL__") {
+        const t = new Date(item.created_at).getTime();
+        if (t > latestClearTime) latestClearTime = t;
+      } else if (name === "__SYSTEM_DELETED_TEAM__") {
+        if (item.leader_name) deletedTeamIds.add(item.leader_name);
+        if (item.project_title) deletedTeamNames.add(item.project_title);
+      }
+    });
+
+    const valid = data.filter(item => {
+      const name = item.team_name || "";
+      if (name.startsWith("__SYSTEM_")) return false;
+      if (latestClearTime > 0) {
+        const t = new Date(item.created_at).getTime();
+        if (t <= latestClearTime) return false;
+      }
+      if (deletedTeamIds.has(item.id) || deletedTeamIds.has(name) || deletedTeamNames.has(name)) {
+        return false;
+      }
+      return true;
+    });
+
+    return valid.map(item => ({
       id: item.id,
       teamName: item.team_name,
       leaderName: item.leader_name,
@@ -756,10 +793,36 @@ async function loadFromSupabase() {
   }
 }
 
-// Helper: Delete all submissions from Supabase
+// Helper: Delete all submissions from Supabase and local cache
 async function clearAllFromSupabase() {
+  const timestamp = Date.now();
   try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=not.is.null`, {
+    localStorage.setItem("expo_cleared_timestamp", String(timestamp));
+    localStorage.removeItem("expoSubmissions");
+    localStorage.removeItem("expo_deleted_team_ids");
+  } catch(e) {}
+
+  // 1. Insert clear-all marker into Supabase
+  try {
+    await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_CONFIG.key,
+        "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        team_name: "__SYSTEM_DELETED_ALL__",
+        leader_name: "ALL",
+        project_title: "RESET_" + timestamp
+      })
+    });
+  } catch(e) {}
+
+  // 2. Also send direct PostgREST DELETE in case RLS allows
+  try {
+    await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=not.is.null`, {
       method: "DELETE",
       headers: {
         "apikey": SUPABASE_CONFIG.key,
@@ -767,11 +830,55 @@ async function clearAllFromSupabase() {
         "Prefer": "return=minimal"
       }
     });
-    return res.ok;
-  } catch (err) {
-    console.error("Error clearing Supabase submissions:", err);
-    return false;
+  } catch(e) {}
+
+  return true;
+}
+
+// Helper: Delete individual team from Supabase and local cache
+async function deleteSingleTeamFromSupabase(teamId, teamName) {
+  try {
+    const localDeleted = JSON.parse(localStorage.getItem("expo_deleted_team_ids") || "[]");
+    if (teamId) localDeleted.push(teamId);
+    if (teamName) localDeleted.push(teamName);
+    localStorage.setItem("expo_deleted_team_ids", JSON.stringify(localDeleted));
+
+    let localSubs = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+    localSubs = localSubs.filter(s => s.teamName !== teamName && s.id !== teamId);
+    localStorage.setItem("expoSubmissions", JSON.stringify(localSubs));
+  } catch(e) {}
+
+  try {
+    await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_CONFIG.key,
+        "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        team_name: "__SYSTEM_DELETED_TEAM__",
+        leader_name: teamId || teamName,
+        project_title: teamName
+      })
+    });
+  } catch(e) {}
+
+  if (teamId) {
+    try {
+      await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=eq.${teamId}`, {
+        method: "DELETE",
+        headers: {
+          "apikey": SUPABASE_CONFIG.key,
+          "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+          "Prefer": "return=minimal"
+        }
+      });
+    } catch(e) {}
   }
+
+  return true;
 }
 
 // Global dashboard state
@@ -1132,21 +1239,57 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${pptHtml}</td>
         <td>${linksHtml}</td>
         <td style="text-align: right;">
-          <button type="button" class="btn-squad-view" data-index="${idx}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <span>Roster (${memberCount})</span>
-          </button>
+          <div style="display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end;">
+            <button type="button" class="btn-squad-view" data-index="${idx}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Roster (${memberCount})</span>
+            </button>
+            <button type="button" class="btn-row-delete-team" title="Delete Team Registration" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-sm, 6px); padding: 6px 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Delete</span>
+            </button>
+          </div>
         </td>
       `;
 
-      // Attach modal opener
+      // Attach modal openers
       const squadBtn = row.querySelector(".btn-squad-view");
       if (squadBtn) {
         squadBtn.addEventListener("click", () => openSquadModal(sub));
       }
 
+      const deleteBtn = row.querySelector(".btn-row-delete-team");
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => openDeleteTeamModal(sub));
+      }
+
       tbody.appendChild(row);
     });
+  }
+
+  // Individual Team Delete State & Modal Triggers
+  let pendingDeleteTeam = null;
+
+  function openDeleteTeamModal(sub) {
+    pendingDeleteTeam = sub;
+    const modal = document.getElementById("delete-team-modal-backdrop");
+    const nameEl = document.getElementById("delete-team-name-display");
+    const s1 = document.getElementById("delete-team-step-1");
+    const s2 = document.getElementById("delete-team-step-2");
+    const stepLabel = document.getElementById("delete-team-modal-step");
+
+    if (!modal) return;
+    if (nameEl) nameEl.textContent = `"${sub.teamName}"`;
+    if (s1) s1.style.display = "block";
+    if (s2) s2.style.display = "none";
+    if (stepLabel) stepLabel.textContent = "Step 1 of 2: Confirmation";
+    modal.classList.add("open");
+  }
+
+  function closeDeleteTeamModal() {
+    const modal = document.getElementById("delete-team-modal-backdrop");
+    if (modal) modal.classList.remove("open");
+    pendingDeleteTeam = null;
   }
 
   // Open Squad Details Modal
@@ -1407,7 +1550,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function openClearModal() {
           generateMathChallenge();
           if (clearModalBackdrop) {
-            clearModalBackdrop.style.display = "flex";
+            clearModalBackdrop.classList.add("open");
           }
           setTimeout(() => {
             if (mathAnswerInput) mathAnswerInput.focus();
@@ -1416,7 +1559,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function closeClearModal() {
           if (clearModalBackdrop) {
-            clearModalBackdrop.style.display = "none";
+            clearModalBackdrop.classList.remove("open");
           }
           if (errClearMath) {
             errClearMath.textContent = "";
@@ -1460,16 +1603,10 @@ document.addEventListener("DOMContentLoaded", () => {
             btnConfirmClearAll.disabled = true;
             btnConfirmClearAll.innerHTML = `<span>Clearing... ⏳</span>`;
 
-            // 1. Clear Supabase cloud
+            // 1. Clear Supabase cloud & local storage
             await clearAllFromSupabase();
 
-            // 2. Clear local storage
-            try {
-              localStorage.removeItem("expoSubmissions");
-              localStorage.removeItem("project_expo_submissions");
-            } catch (e) {}
-
-            // 3. Clear in-memory array & refresh views
+            // 2. Clear in-memory array & refresh views
             adminSubmissions = [];
             updateDashboardView();
 
@@ -1489,6 +1626,70 @@ document.addEventListener("DOMContentLoaded", () => {
               e.preventDefault();
               btnConfirmClearAll?.click();
             }
+          });
+        }
+
+        // Individual Team Delete (2-Step Verification: asks two times)
+        const deleteTeamModalBackdrop = document.getElementById("delete-team-modal-backdrop");
+        const btnCloseDeleteTeamModal = document.getElementById("btn-close-delete-team-modal");
+        const btnCancelDeleteTeam = document.getElementById("btn-cancel-delete-team");
+        const btnProceedStep2 = document.getElementById("btn-proceed-delete-team-step-2");
+        const btnBackStep1 = document.getElementById("btn-back-delete-team-step-1");
+        const btnFinalConfirmDelete = document.getElementById("btn-final-confirm-delete-team");
+        const deleteTeamStep1 = document.getElementById("delete-team-step-1");
+        const deleteTeamStep2 = document.getElementById("delete-team-step-2");
+        const deleteTeamModalStep = document.getElementById("delete-team-modal-step");
+
+        if (btnCloseDeleteTeamModal) {
+          btnCloseDeleteTeamModal.addEventListener("click", closeDeleteTeamModal);
+        }
+        if (btnCancelDeleteTeam) {
+          btnCancelDeleteTeam.addEventListener("click", closeDeleteTeamModal);
+        }
+        if (deleteTeamModalBackdrop) {
+          deleteTeamModalBackdrop.addEventListener("click", (e) => {
+            if (e.target === deleteTeamModalBackdrop) closeDeleteTeamModal();
+          });
+        }
+
+        // Step 1 -> Step 2 (First question answered -> Proceed to second question)
+        if (btnProceedStep2) {
+          btnProceedStep2.addEventListener("click", () => {
+            if (deleteTeamStep1) deleteTeamStep1.style.display = "none";
+            if (deleteTeamStep2) deleteTeamStep2.style.display = "block";
+            if (deleteTeamModalStep) deleteTeamModalStep.textContent = "Step 2 of 2: Final Warning";
+          });
+        }
+
+        // Step 2 -> Back to Step 1
+        if (btnBackStep1) {
+          btnBackStep1.addEventListener("click", () => {
+            if (deleteTeamStep2) deleteTeamStep2.style.display = "none";
+            if (deleteTeamStep1) deleteTeamStep1.style.display = "block";
+            if (deleteTeamModalStep) deleteTeamModalStep.textContent = "Step 1 of 2: Confirmation";
+          });
+        }
+
+        // Final Confirm Delete (After answering both prompts)
+        if (btnFinalConfirmDelete) {
+          btnFinalConfirmDelete.addEventListener("click", async () => {
+            if (!pendingDeleteTeam) return;
+            const target = pendingDeleteTeam;
+            btnFinalConfirmDelete.disabled = true;
+            btnFinalConfirmDelete.innerHTML = `<span>Deleting... ⏳</span>`;
+
+            await deleteSingleTeamFromSupabase(target.id, target.teamName);
+
+            adminSubmissions = adminSubmissions.filter(s => s !== target && s.teamName !== target.teamName && (!target.id || s.id !== target.id));
+            updateDashboardView();
+
+            btnFinalConfirmDelete.disabled = false;
+            btnFinalConfirmDelete.innerHTML = `
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Confirm &amp; Delete</span>`;
+
+            closeDeleteTeamModal();
+            alert(`Team "${target.teamName}" has been permanently deleted.`);
           });
         }
 

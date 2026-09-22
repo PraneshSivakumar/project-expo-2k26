@@ -140,7 +140,7 @@
                 <th>Track</th>
                 <th>PPT Slide Deck</th>
                 <th>External Links</th>
-                <th style="text-align: right;">Roster</th>
+                <th style="text-align: right; min-width: 170px;">Actions</th>
               </tr>
             </thead>
             <tbody id="admin-table-body">
@@ -169,7 +169,7 @@
     </div>
 
     <!-- Clear All Security Confirmation Modal with Math Challenge -->
-    <div class="admin-modal-backdrop" id="clear-all-modal-backdrop" style="display: none;">
+    <div class="admin-modal-backdrop" id="clear-all-modal-backdrop">
       <div class="admin-modal-card" style="max-width: 480px;">
         <div class="modal-header-strip" style="border-bottom: 1px solid rgba(239, 68, 68, 0.25);">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -207,6 +207,58 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               <span>Clear Everything</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Individual Team Delete Confirmation Modal (2-Step Verification) -->
+    <div class="admin-modal-backdrop" id="delete-team-modal-backdrop">
+      <div class="admin-modal-card" style="max-width: 460px;">
+        <div class="modal-header-strip" style="border-bottom: 1px solid rgba(239, 68, 68, 0.25);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </div>
+            <div>
+              <h3 class="modal-title" id="delete-team-modal-title" style="color: #ef4444; font-size: 1.15rem; margin-bottom: 2px;">Delete Team Registration</h3>
+              <p class="modal-subtitle" id="delete-team-modal-step">Step 1 of 2: Confirmation</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-close-delete-team-modal">✕</button>
+        </div>
+        <div class="modal-body-content" style="padding: 24px 20px;">
+          <!-- Step 1 Content -->
+          <div id="delete-team-step-1">
+            <p style="font-size: 0.95rem; line-height: 1.5; color: var(--color-foreground); margin-bottom: 14px;">
+              Are you sure you want to remove <strong id="delete-team-name-display" style="color: #ef4444;">Team Name</strong> from registrations?
+            </p>
+            <p style="font-size: 0.82rem; color: var(--color-foreground-secondary); margin-bottom: 24px; line-height: 1.4;">
+              This will remove this team's roster, project details, slide deck, and link records.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-delete-team" style="padding: 8px 18px;">Cancel</button>
+              <button type="button" class="btn btn-danger" id="btn-proceed-delete-team-step-2" style="background: #ef4444; color: #fff; border: none; padding: 8px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;">
+                <span>Yes, Continue</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2 Content (Second prompt as requested by user) -->
+          <div id="delete-team-step-2" style="display: none;">
+            <div style="background: rgba(239, 68, 68, 0.06); border: 1px dashed rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: #dc2626; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">⚠️ Final Confirmation</span>
+              <p style="font-size: 0.88rem; color: var(--color-foreground); margin: 0; line-height: 1.4;">
+                Are you completely sure you want to permanently delete this team? This action cannot be reversed.
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+              <button type="button" class="btn btn-secondary" id="btn-back-delete-team-step-1" style="padding: 8px 16px;">Go Back</button>
+              <button type="button" class="btn btn-danger" id="btn-final-confirm-delete-team" style="background: #dc2626; color: #fff; border: none; padding: 8px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Confirm &amp; Delete</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
