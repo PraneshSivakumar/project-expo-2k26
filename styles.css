@@ -2425,38 +2425,344 @@ h1, h2, h3, h4 {
     margin: 0 auto;
 }
 
-/* Custom styling for file inputs to match Mintlify green */
-input[type="file"]::file-selector-button {
-  background-color: var(--color-primary);
-  color: #ffffff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  margin-right: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-input[type="file"]::file-selector-button:hover {
-  background-color: var(--color-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(18, 172, 118, 0.15);
-}
-
-input[type="file"] {
-  padding: 6px;
-  background-color: var(--color-background-elevated);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-foreground-muted);
-  font-family: inherit;
-  font-size: 0.9rem;
-  width: 100%;
+/* Modern Elegant File Upload Dropzone */
+.file-upload-dropzone {
+  position: relative;
+  border: 2px dashed rgba(16, 185, 129, 0.32);
+  border-radius: var(--radius-md, 12px);
+  background: rgba(16, 185, 129, 0.03);
+  padding: 28px 20px;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 145px;
+  overflow: hidden;
   box-sizing: border-box;
+  width: 100%;
+}
+
+.file-upload-dropzone:hover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.06);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.08);
+}
+
+.file-upload-dropzone.drag-active {
+  border-color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  transform: scale(1.01);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+}
+
+.file-upload-dropzone.has-file {
+  border-style: solid;
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.04);
+  padding: 16px;
+}
+
+.file-upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+}
+
+.file-upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  width: 100%;
+  max-width: 440px;
+}
+
+.file-upload-icon-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.file-upload-dropzone:hover .file-upload-icon-circle {
+  transform: translateY(-2px);
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.file-upload-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.file-upload-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-foreground, #1e293b);
+}
+
+.file-upload-browse {
+  color: #0c8c5e;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.file-upload-hint {
+  font-size: 0.8rem;
+  color: var(--color-foreground-secondary, #64748b);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.file-upload-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #0c8c5e;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  margin-top: 4px;
+}
+
+/* File Selected State Card */
+.file-upload-selected {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-background-elevated, #ffffff);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.file-preview-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-pdf-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.file-preview-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.file-preview-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-foreground, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-size {
+  font-size: 0.76rem;
+  color: var(--color-foreground-secondary, #64748b);
+}
+
+.btn-file-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-background-subtle, #f1f5f9);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-foreground-secondary, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.btn-file-remove:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+@media (max-width: 600px) {
+  .file-upload-dropzone {
+    padding: 20px 14px;
+    min-height: 130px;
+  }
+  .file-upload-selected {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .file-preview-left {
+    width: 100%;
+  }
+  .btn-file-remove {
+    align-self: flex-end;
+  }
+}
+
+/* Presented by E-Cell Showcase Card on Contact Page */
+.presented-by-ecell-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  border-radius: var(--radius-lg, 16px);
+  padding: clamp(24px, 4vw, 36px);
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.presented-by-ecell-card::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ecell-logo-presentation-wrap {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ecell-presentation-logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(12, 140, 94, 0.2);
+  border: 3px solid #ffffff;
+  background: #ffffff;
+  display: block;
+}
+
+.ecell-presentation-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ecell-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0c8c5e;
+  margin-bottom: 6px;
+}
+
+.ecell-presentation-title {
+  font-family: var(--font-display, "Instrument Serif", serif);
+  font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+  font-weight: 400;
+  color: var(--color-foreground, #0f172a);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.ecell-presentation-title strong {
+  font-family: inherit;
+  font-weight: 400;
+  font-style: italic;
+  color: #0c8c5e;
+}
+
+.ecell-presentation-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-foreground-secondary, #475569);
+  margin-bottom: 16px;
+  max-width: 680px;
+}
+
+.ecell-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ecell-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-foreground, #1e293b);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  padding: 4px 12px;
+  border-radius: 9999px;
+}
+
+@media (max-width: 768px) {
+  .presented-by-ecell-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 18px;
+    gap: 18px;
+  }
+  .ecell-presentation-desc {
+    text-align: center;
+  }
+  .ecell-highlights {
+    justify-content: center;
+  }
+  .ecell-presentation-logo {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 /* ===================================================================

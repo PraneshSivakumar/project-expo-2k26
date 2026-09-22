@@ -320,12 +320,14 @@ function N() {
           <label class="form-label">Department</label>
           <select class="form-input form-select member-dept">
             <option value="CSE" selected>Computer Science (CSE)</option>
-            <option value="AI&DS">AI & Data Science</option>
-            <option value="IT">Information Technology</option>
+            <option value="AI & ML">AI &amp; Machine Learning (AI &amp; ML)</option>
+            <option value="AI & DS">AI &amp; Data Science (AI &amp; DS)</option>
+            <option value="IT">Information Technology (IT)</option>
             <option value="ECE">Electronics (ECE)</option>
             <option value="EEE">Electrical (EEE)</option>
-            <option value="MECH">Mechanical</option>
-            <option value="Other">Other Branch</option>
+            <option value="MECH">Mechanical (MECH)</option>
+            <option value="Agri">Agricultural Engineering (Agri)</option>
+            <option value="Others">Others</option>
           </select>
         </div>
         <div class="form-group col-4">
@@ -759,8 +761,100 @@ let adminSubmissions = [];
 let adminActiveFilter = "all";
 let adminSearchQuery = "";
 
+// PPT File Upload Dropzone Handler
+function setupPPTDropzone() {
+  const dropzone = document.getElementById("ppt-dropzone");
+  const input = document.getElementById("ppt-upload");
+  const promptEl = document.getElementById("ppt-upload-prompt");
+  const previewEl = document.getElementById("ppt-selected-preview");
+  const fileNameEl = document.getElementById("ppt-file-name");
+  const fileSizeEl = document.getElementById("ppt-file-size");
+  const btnRemove = document.getElementById("btn-remove-ppt");
+  const errEl = document.getElementById("err-ppt-upload");
+
+  if (!dropzone || !input) return;
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") {
+      if (errEl) errEl.textContent = "Only PDF presentation deck files (.pdf) are accepted.";
+      input.value = "";
+      return;
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      if (errEl) errEl.textContent = "File size exceeds 25MB. Please compress or link a drive.";
+      input.value = "";
+      return;
+    }
+    if (errEl) errEl.textContent = "";
+
+    if (fileNameEl) fileNameEl.textContent = file.name;
+    if (fileSizeEl) fileSizeEl.textContent = `${formatBytes(file.size)} • Ready for submission`;
+    if (promptEl) promptEl.style.display = "none";
+    if (previewEl) previewEl.style.display = "flex";
+    dropzone.classList.add("has-file");
+  }
+
+  input.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  });
+
+  if (btnRemove) {
+    btnRemove.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      input.value = "";
+      if (promptEl) promptEl.style.display = "flex";
+      if (previewEl) previewEl.style.display = "none";
+      dropzone.classList.remove("has-file");
+      if (errEl) errEl.textContent = "";
+    });
+  }
+
+  ["dragenter", "dragover"].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.add("drag-active");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzone.classList.remove("drag-active");
+    });
+  });
+
+  dropzone.addEventListener("drop", (e) => {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFile = e.dataTransfer.files[0];
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(droppedFile);
+        input.files = dt.files;
+      } catch (err) {
+        // Fallback
+      }
+      handleFile(droppedFile);
+    }
+  });
+}
+
 // ADMIN PORTAL & SUBMISSION LOGIC (SUPABASE CLOUD CONNECTED)
 document.addEventListener("DOMContentLoaded", () => {
+  setupPPTDropzone();
   // Submission Save Logic
   const btnSubmitProject = document.getElementById("btn-submit-project");
   if (btnSubmitProject) {
@@ -1527,7 +1621,6 @@ function setupMobileNav() {
     drawer.innerHTML = `
       <div class="mobile-drawer-header">
         <div class="mobile-drawer-title">
-          <img src="/ecell-logo.png" alt="E-Cell Logo" style="width:28px;height:28px;border-radius:50%;">
           <span>Project Expo 2K26</span>
         </div>
         <button type="button" class="mobile-drawer-close" id="btn-mobile-drawer-close">✕</button>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -19,7 +19,6 @@
   <header class="sticky-nav" id="main-nav">
     <div class="nav-container">
       <a href="/index.html" class="brand-logo" id="nav-brand">
-        <img src="/ecell-logo.png" alt="E-Cell" class="brand-logo-img" style="width:30px;height:30px;border-radius:50%;">
         <div class="brand-text-wrap">
           <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
         </div>
@@ -146,12 +145,15 @@
                   <label for="leader-dept" class="form-label required">Department</label>
                   <select id="leader-dept" class="form-input form-select" required>
                     <option value="" disabled selected>Select Department</option>
-                    <option value="Computer Science & Engineering (CSE)">Computer Science & Engg (CSE)</option>
-                    <option value="Artificial Intelligence & Data Science (AI&DS)">AI & Data Science (AI&DS)</option>
+                    <option value="Computer Science & Engineering (CSE)">Computer Science &amp; Engineering (CSE)</option>
+                    <option value="Artificial Intelligence & Machine Learning (AI & ML)">Artificial Intelligence &amp; Machine Learning (AI &amp; ML)</option>
+                    <option value="Artificial Intelligence & Data Science (AI & DS)">Artificial Intelligence &amp; Data Science (AI &amp; DS)</option>
                     <option value="Information Technology (IT)">Information Technology (IT)</option>
-                    <option value="Electronics & Communication (ECE)">Electronics & Comm (ECE)</option>
-                    <option value="Electrical & Electronics (EEE)">Electrical & Electronics (EEE)</option>
+                    <option value="Electronics & Communication Engineering (ECE)">Electronics &amp; Communication (ECE)</option>
+                    <option value="Electrical & Electronics Engineering (EEE)">Electrical &amp; Electronics (EEE)</option>
                     <option value="Mechanical Engineering (MECH)">Mechanical Engineering (MECH)</option>
+                    <option value="Agricultural Engineering (Agri)">Agricultural Engineering (Agri)</option>
+                    <option value="Others">Others</option>
                   </select>
                   <span class="field-error" id="err-leader-dept"></span>
                 </div>
@@ -192,8 +194,49 @@
 
               <div class="form-row">
                 <div class="form-group col-12">
-                  <label class="form-label required">PPT Submission (PDF Only)</label>
-                  <input type="file" id="ppt-upload" class="form-input" accept=".pdf" required>
+                  <label class="form-label required" for="ppt-upload">PPT Submission (PDF Slide Deck)</label>
+                  <div class="file-upload-dropzone" id="ppt-dropzone">
+                    <input type="file" id="ppt-upload" class="file-upload-input" accept=".pdf,application/pdf" required>
+                    <div class="file-upload-content" id="ppt-upload-prompt">
+                      <div class="file-upload-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="17 8 12 3 7 8"/>
+                          <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                      </div>
+                      <div class="file-upload-text">
+                        <span class="file-upload-title"><span class="file-upload-browse">Click to upload</span> or drag and drop</span>
+                        <span class="file-upload-hint">PDF presentation deck summarizing problem, architecture &amp; demo plan (Max 15MB)</span>
+                      </div>
+                      <span class="file-upload-badge">PDF Only</span>
+                    </div>
+
+                    <!-- Selected file preview state -->
+                    <div class="file-upload-selected" id="ppt-selected-preview" style="display: none;">
+                      <div class="file-preview-left">
+                        <div class="file-pdf-icon">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                          </svg>
+                          <span>PDF</span>
+                        </div>
+                        <div class="file-preview-meta">
+                          <span class="file-preview-name" id="ppt-file-name">presentation.pdf</span>
+                          <span class="file-preview-size" id="ppt-file-size">1.2 MB • Ready for submission</span>
+                        </div>
+                      </div>
+                      <button type="button" class="btn-file-remove" id="btn-remove-ppt" title="Change file">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        <span>Change</span>
+                      </button>
+                    </div>
+                  </div>
+                  <span class="field-error" id="err-ppt-upload"></span>
                 </div>
               </div>
 
@@ -362,7 +405,6 @@
     <div class="container footer-content">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="/ecell-logo.png" alt="E-Cell" class="footer-logo-img" style="width:24px;height:24px;border-radius:50%;">
           <span class="footer-title">PROJECT EXPO 2K26</span>
         </div>
         <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
