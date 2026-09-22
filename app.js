@@ -1447,3 +1447,142 @@ function showSuccessScreen(teamName, leaderName) {
     if (sec <= 0) { clearInterval(timer); window.location.href = "/index.html"; }
   }, 1000);
 }
+
+// ==========================================
+// 📱 UNIVERSAL MOBILE NAVIGATION SETUP
+// Ensures Home, About, Schedule, Guidelines, Registration, FAQ, Contact
+// are accessible and beautifully displayed on all mobile devices!
+// ==========================================
+function setupMobileNav() {
+  const navContainer = document.querySelector(".nav-container");
+  const stickyNav = document.querySelector(".sticky-nav");
+  if (!navContainer || !stickyNav) return;
+
+  const currentPath = window.location.pathname.toLowerCase();
+
+  const navItems = [
+    { title: "Home", href: "/index.html", icon: "🏠" },
+    { title: "About", href: "/about.html", icon: "📖" },
+    { title: "Schedule", href: "/schedule.html", icon: "📅" },
+    { title: "Guidelines", href: "/guidelines.html", icon: "📋" },
+    { title: "Registration", href: "/registration.html", icon: "🚀", highlight: true },
+    { title: "FAQ", href: "/faq.html", icon: "❓" },
+    { title: "Contact", href: "/contact.html", icon: "📍" },
+    { title: "Admin", href: "/admin.html", icon: "🔒" }
+  ];
+
+  // 1. Add Hamburger button to header if not present
+  if (!document.getElementById("btn-mobile-nav-toggle")) {
+    const hamburgerBtn = document.createElement("button");
+    hamburgerBtn.type = "button";
+    hamburgerBtn.className = "mobile-nav-toggle";
+    hamburgerBtn.id = "btn-mobile-nav-toggle";
+    hamburgerBtn.setAttribute("aria-label", "Toggle navigation menu");
+    hamburgerBtn.innerHTML = `
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    `;
+
+    const navActions = navContainer.querySelector(".nav-actions");
+    if (navActions) {
+      navActions.appendChild(hamburgerBtn);
+    } else {
+      navContainer.appendChild(hamburgerBtn);
+    }
+  }
+
+  // 2. Add Mobile Slide-Out Drawer if not present
+  if (!document.getElementById("mobile-nav-drawer")) {
+    const drawer = document.createElement("div");
+    drawer.className = "mobile-nav-drawer";
+    drawer.id = "mobile-nav-drawer";
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "mobile-nav-backdrop";
+    backdrop.id = "mobile-nav-backdrop";
+
+    const linksHtml = navItems.map(item => {
+      const isActive = currentPath === item.href.toLowerCase() || 
+        (item.href === "/index.html" && (currentPath === "/" || currentPath.endsWith("index.html") || currentPath === ""));
+      return `
+        <a href="${item.href}" class="mobile-drawer-link ${isActive ? 'active' : ''}">
+          <span class="drawer-link-icon">${item.icon}</span>
+          <span>${item.title}</span>
+          ${item.highlight ? `<span class="drawer-badge">Live</span>` : ''}
+        </a>
+      `;
+    }).join("");
+
+    drawer.innerHTML = `
+      <div class="mobile-drawer-header">
+        <div class="mobile-drawer-title">
+          <span style="color:#0c8c5e;">❖</span>
+          <span>Project Expo 2K26</span>
+        </div>
+        <button type="button" class="mobile-drawer-close" id="btn-mobile-drawer-close">✕</button>
+      </div>
+      <div class="mobile-drawer-links">
+        ${linksHtml}
+      </div>
+      <div class="mobile-drawer-footer">
+        <a href="/registration.html" class="btn btn-primary btn-submit-glow" style="width:100%; justify-content:center;">
+          <span>Register Team Now</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    `;
+
+    document.body.appendChild(drawer);
+    document.body.appendChild(backdrop);
+
+    // Toggle drawer open/close
+    const toggleBtn = document.getElementById("btn-mobile-nav-toggle");
+    const closeBtn = document.getElementById("btn-mobile-drawer-close");
+
+    function openDrawer() {
+      drawer.classList.add("open");
+      backdrop.classList.add("open");
+      toggleBtn?.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      backdrop.classList.remove("open");
+      toggleBtn?.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    toggleBtn?.addEventListener("click", () => {
+      if (drawer.classList.contains("open")) closeDrawer();
+      else openDrawer();
+    });
+
+    closeBtn?.addEventListener("click", closeDrawer);
+    backdrop.addEventListener("click", closeDrawer);
+  }
+
+  // 3. Add Horizontal Quick-Swipe Nav Strip (Matching user's photo!)
+  if (!document.getElementById("mobile-quick-nav-strip")) {
+    const strip = document.createElement("nav");
+    strip.className = "mobile-quick-scroll-strip";
+    strip.id = "mobile-quick-nav-strip";
+
+    const stripLinks = navItems.filter(item => item.title !== "Admin").map(item => {
+      const isActive = currentPath === item.href.toLowerCase() || 
+        (item.href === "/index.html" && (currentPath === "/" || currentPath.endsWith("index.html") || currentPath === ""));
+      return `
+        <a href="${item.href}" class="quick-strip-link ${isActive ? 'active' : ''}">
+          ${item.title}
+        </a>
+      `;
+    }).join("");
+
+    strip.innerHTML = stripLinks;
+    stickyNav.insertAdjacentElement("afterend", strip);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", setupMobileNav);
+

@@ -3354,4 +3354,229 @@ input[type="file"] {
   }
 }
 
+/* ===================================================================
+   MOBILE NAVIGATION SYSTEM — HAMBURGER & QUICK SWIPE STRIP
+   Ensures all menu items (Home, About, Schedule, Guidelines, etc.)
+   are beautifully accessible on all mobile devices!
+   =================================================================== */
+
+.mobile-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #faf8f5;
+  cursor: pointer;
+  gap: 5px;
+  padding: 0;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.hamburger-line {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: var(--color-foreground-main);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.mobile-nav-toggle.open .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-nav-toggle.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-nav-toggle.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Slide-out Drawer */
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 310px;
+  max-width: 86vw;
+  background: #ffffff;
+  z-index: 10001;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.mobile-nav-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.mobile-nav-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-drawer-header {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.mobile-drawer-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-foreground-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-drawer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #faf8f5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--color-foreground-secondary);
+}
+
+.mobile-drawer-links {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.mobile-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: var(--color-foreground-main);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.15s ease;
+}
+
+.mobile-drawer-link:hover, .mobile-drawer-link.active {
+  background: rgba(12, 140, 94, 0.08);
+  color: #0c8c5e;
+  font-weight: 600;
+}
+
+.drawer-link-icon {
+  font-size: 1.15rem;
+  width: 24px;
+  text-align: center;
+}
+
+.drawer-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: #18e299;
+  color: #054830;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.mobile-drawer-footer {
+  padding: 18px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  background: #faf8f5;
+}
+
+/* Horizontal Quick-Swipe Nav Strip for Mobile (Visible under sticky nav) */
+.mobile-quick-scroll-strip {
+  display: none;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 8px 16px;
+  background: rgba(254, 253, 251, 0.96);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: sticky;
+  top: 57px;
+  z-index: 999;
+}
+
+.mobile-quick-scroll-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-strip-link {
+  display: inline-block;
+  padding: 6px 13px;
+  border-radius: var(--radius-pill);
+  color: var(--color-foreground-secondary);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: #faf8f5;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin-right: 6px;
+  transition: all 0.15s ease;
+}
+
+.quick-strip-link:last-child {
+  margin-right: 0;
+}
+
+.quick-strip-link.active {
+  background: #0c8c5e;
+  color: #ffffff;
+  border-color: #0c8c5e;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav-toggle {
+    display: flex;
+  }
+  .mobile-quick-scroll-strip {
+    display: flex;
+  }
+  .nav-container {
+    padding: 10px 16px;
+  }
+  #nav-cta-btn {
+    padding: 7px 12px;
+    font-size: 0.78rem;
+  }
+}
+
+
 
