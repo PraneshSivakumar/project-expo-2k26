@@ -166,6 +166,9 @@ export function generateConfirmationEmailHtml(data) {
                 <p style="margin:0 0 8px 0; color:#1f2937; font-size:13px; line-height:1.5;">
                   For any queries, feel free to contact us at <a href="mailto:ecellvsbcetc@gmail.com" style="color:#0c8c5e; text-decoration:underline;">ecellvsbcetc@gmail.com</a>.
                 </p>
+                <p style="margin:0 0 8px 0; color:#525252; font-size:12px; line-height:1.5;">
+                  Helpline: Boys: <a href="tel:+919791919289" style="color:#111827; font-weight:600; text-decoration:none;">+91 97919 19289</a> &bull; Girls: <a href="tel:+919786353006" style="color:#111827; font-weight:600; text-decoration:none;">+91 97863 53006</a>
+                </p>
                 <p style="margin:0; color:#111827; font-size:13px; font-weight:700;">
                   Thank you for being a part of Project Expo '26.
                 </p>
