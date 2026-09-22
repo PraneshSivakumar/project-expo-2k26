@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PROJECT EXPO 2K26 — Intelligent Innovation & Registration Platform</title>
+  <title>PROJECT EXPO 2K26 — Intelligent Innovation &amp; Registration Platform</title>
   <meta name="description" content="Official registration and project submission portal for Project Expo 2K26. Intra-college innovation hackathon, project showcase, and technical symposium.">
   
   <!-- Mintlify-inspired Typography: Inter + Instrument Serif (Arizona Flare aesthetic) -->
@@ -22,7 +22,8 @@
         <div class="brand-text-wrap">
           <span class="brand-name">Project Expo <span class="brand-year">2K26</span></span>
         </div>
-      </a></div>
+      </a>
+    </div>
   </header>
 
   <main>
@@ -75,7 +76,7 @@
               <span class="stat-icon">💻</span>
             </div>
             <div class="stat-number" id="stat-software-teams">0</div>
-            <div class="stat-subtext">AI, Web, Mobile & Cloud tracks</div>
+            <div class="stat-subtext">AI, Web, Mobile &amp; Cloud tracks</div>
           </div>
 
           <div class="admin-stat-card">
@@ -84,7 +85,7 @@
               <span class="stat-icon">⚙️</span>
             </div>
             <div class="stat-number" id="stat-hardware-teams">0</div>
-            <div class="stat-subtext">IoT, Robotics & Embedded tracks</div>
+            <div class="stat-subtext">IoT, Robotics &amp; Embedded tracks</div>
           </div>
 
           <div class="admin-stat-card">
@@ -93,11 +94,11 @@
               <span class="stat-icon">🎓</span>
             </div>
             <div class="stat-number" id="stat-total-members">0</div>
-            <div class="stat-subtext">Students & collaborators registered</div>
+            <div class="stat-subtext">Students &amp; collaborators registered</div>
           </div>
         </div>
 
-        <!-- Toolbar: Search, Filters, Refresh, and Export -->
+        <!-- Toolbar: Search, Filters, Refresh, Export, and Clear All -->
         <div class="admin-toolbar">
           <div class="admin-search-wrapper">
             <svg class="admin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -121,6 +122,10 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span>Export CSV</span>
             </button>
+            <button type="button" class="btn-admin-action btn-admin-clear" id="btn-admin-clear-all" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              <span>Clear All</span>
+            </button>
           </div>
         </div>
 
@@ -130,7 +135,7 @@
             <thead>
               <tr>
                 <th style="width: 50px;">#</th>
-                <th>Team & Concept</th>
+                <th>Team &amp; Concept</th>
                 <th>Team Leader</th>
                 <th>Track</th>
                 <th>PPT Slide Deck</th>
@@ -162,18 +167,62 @@
         </div>
       </div>
     </div>
+
+    <!-- Clear All Security Confirmation Modal with Math Challenge -->
+    <div class="admin-modal-backdrop" id="clear-all-modal-backdrop" style="display: none;">
+      <div class="admin-modal-card" style="max-width: 480px;">
+        <div class="modal-header-strip" style="border-bottom: 1px solid rgba(239, 68, 68, 0.25);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+              <h3 class="modal-title" style="color: #ef4444; font-size: 1.15rem; margin-bottom: 2px;">Delete All Registrations?</h3>
+              <p class="modal-subtitle" style="margin-bottom: 0;">Permanent &amp; Irreversible Action</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-close-clear-modal">✕</button>
+        </div>
+        <div class="modal-body-content" style="padding: 24px 20px;">
+          <p style="font-size: 0.92rem; line-height: 1.5; color: var(--color-foreground-secondary); margin-bottom: 18px;">
+            This action will permanently erase <strong>all team submissions</strong> from both the Supabase cloud database and local cache. To prevent accidental clicks, please solve the security addition question:
+          </p>
+          
+          <div style="background: rgba(239, 68, 68, 0.04); border: 1px dashed rgba(239, 68, 68, 0.35); border-radius: 10px; padding: 16px; margin-bottom: 18px; text-align: center;">
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #ef4444; display: block; margin-bottom: 6px;">Security Challenge</span>
+            <div id="clear-math-question" style="font-size: 1.5rem; font-weight: 700; color: var(--color-foreground); letter-spacing: 1px;">
+              <!-- e.g. What is 19 + 28? -->
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label for="clear-math-answer" class="form-label required" style="font-size: 0.85rem;">Enter the answer to confirm:</label>
+            <input type="number" id="clear-math-answer" class="form-input" placeholder="Type sum here..." style="font-size: 1.1rem; text-align: center; font-weight: 600;" autocomplete="off">
+            <span class="field-error" id="err-clear-math" style="display: block; margin-top: 6px; font-size: 0.82rem;"></span>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-clear-all" style="padding: 8px 18px;">Cancel</button>
+            <button type="button" class="btn btn-danger" id="btn-confirm-clear-all" style="background: #dc2626; color: #fff; border: none; padding: 8px 18px; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Clear Everything</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
-<footer class="footer">
+  <footer class="footer">
     <div class="container footer-content">
       <div class="footer-brand">
         <div class="footer-logo">
           <span class="footer-title">PROJECT EXPO 2K26</span>
         </div>
-        <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
+        <p class="footer-tagline">Intra-College Technical Exhibition &amp; Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
         <span class="footer-copyright">© 2026 Project Expo. All rights reserved.</span>
       </div>
-      </div>
+    </div>
   </footer>
 
 </body>

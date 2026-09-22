@@ -756,6 +756,24 @@ async function loadFromSupabase() {
   }
 }
 
+// Helper: Delete all submissions from Supabase
+async function clearAllFromSupabase() {
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=not.is.null`, {
+      method: "DELETE",
+      headers: {
+        "apikey": SUPABASE_CONFIG.key,
+        "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+        "Prefer": "return=minimal"
+      }
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("Error clearing Supabase submissions:", err);
+    return false;
+  }
+}
+
 // Global dashboard state
 let adminSubmissions = [];
 let adminActiveFilter = "all";
@@ -1357,6 +1375,121 @@ document.addEventListener("DOMContentLoaded", () => {
         const btnExport = document.getElementById("btn-admin-export");
         if (btnExport) {
           btnExport.addEventListener("click", exportSubmissionsCSV);
+        }
+
+        // Clear All Submissions with Math Challenge Protection
+        const btnClearAll = document.getElementById("btn-admin-clear-all");
+        const clearModalBackdrop = document.getElementById("clear-all-modal-backdrop");
+        const btnCloseClearModal = document.getElementById("btn-close-clear-modal");
+        const btnCancelClearAll = document.getElementById("btn-cancel-clear-all");
+        const btnConfirmClearAll = document.getElementById("btn-confirm-clear-all");
+        const mathQuestionEl = document.getElementById("clear-math-question");
+        const mathAnswerInput = document.getElementById("clear-math-answer");
+        const errClearMath = document.getElementById("err-clear-math");
+
+        let currentMathSum = 0;
+
+        function generateMathChallenge() {
+          const n1 = Math.floor(Math.random() * 40) + 11;
+          const n2 = Math.floor(Math.random() * 40) + 12;
+          currentMathSum = n1 + n2;
+          if (mathQuestionEl) {
+            mathQuestionEl.textContent = `What is ${n1} + ${n2} ?`;
+          }
+          if (mathAnswerInput) {
+            mathAnswerInput.value = "";
+          }
+          if (errClearMath) {
+            errClearMath.textContent = "";
+          }
+        }
+
+        function openClearModal() {
+          generateMathChallenge();
+          if (clearModalBackdrop) {
+            clearModalBackdrop.style.display = "flex";
+          }
+          setTimeout(() => {
+            if (mathAnswerInput) mathAnswerInput.focus();
+          }, 100);
+        }
+
+        function closeClearModal() {
+          if (clearModalBackdrop) {
+            clearModalBackdrop.style.display = "none";
+          }
+          if (errClearMath) {
+            errClearMath.textContent = "";
+          }
+        }
+
+        if (btnClearAll) {
+          btnClearAll.addEventListener("click", openClearModal);
+        }
+
+        if (btnCloseClearModal) {
+          btnCloseClearModal.addEventListener("click", closeClearModal);
+        }
+
+        if (btnCancelClearAll) {
+          btnCancelClearAll.addEventListener("click", closeClearModal);
+        }
+
+        if (clearModalBackdrop) {
+          clearModalBackdrop.addEventListener("click", (e) => {
+            if (e.target === clearModalBackdrop) {
+              closeClearModal();
+            }
+          });
+        }
+
+        if (btnConfirmClearAll) {
+          btnConfirmClearAll.addEventListener("click", async () => {
+            const val = mathAnswerInput ? parseInt(mathAnswerInput.value.trim(), 10) : NaN;
+            if (isNaN(val) || val !== currentMathSum) {
+              if (errClearMath) {
+                errClearMath.textContent = "Incorrect answer! Please solve the question correctly to proceed.";
+                errClearMath.style.color = "#ef4444";
+              }
+              generateMathChallenge();
+              if (mathAnswerInput) mathAnswerInput.focus();
+              return;
+            }
+
+            // Correct answer provided, execute clear
+            btnConfirmClearAll.disabled = true;
+            btnConfirmClearAll.innerHTML = `<span>Clearing... ⏳</span>`;
+
+            // 1. Clear Supabase cloud
+            await clearAllFromSupabase();
+
+            // 2. Clear local storage
+            try {
+              localStorage.removeItem("expoSubmissions");
+              localStorage.removeItem("project_expo_submissions");
+            } catch (e) {}
+
+            // 3. Clear in-memory array & refresh views
+            adminSubmissions = [];
+            updateDashboardView();
+
+            btnConfirmClearAll.disabled = false;
+            btnConfirmClearAll.innerHTML = `
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Clear Everything</span>`;
+
+            closeClearModal();
+            alert("All registrations have been permanently cleared from both cloud and local storage.");
+          });
+        }
+
+        if (mathAnswerInput) {
+          mathAnswerInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              btnConfirmClearAll?.click();
+            }
+          });
         }
 
       } else {
