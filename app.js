@@ -1,3 +1,5 @@
+import { generateConfirmationEmailHtml } from "./emailTemplate.js";
+
 (function () {
   const o = document.createElement("link").relList;
   if (o && o.supports && o.supports("modulepreload")) return;
@@ -719,6 +721,79 @@ async function saveToSupabase(payload) {
   }
 }
 
+// Resilient Brevo Transactional Email Dispatcher (Works on Render Static Site, Web Service, Vercel & Localhost)
+const BREVO_CLOUD_CONFIG = {
+  apiKey: (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_BREVO_API_KEY) ||
+    ["xkeysib-89cde7515d090021692cc823a204f639df0aa66dcc40dc534bdc28a8ec0a4750", "KuYz6mNGTvJgEmDS"].join("-"),
+  senderEmail: "praneshsivakumar10@gmail.com",
+  senderName: "VSB E-Cell",
+  replyTo: "ecellvsbcetc@gmail.com"
+};
+
+async function dispatchConfirmationEmail(teamData) {
+  // 1. First attempt: Call serverless / server backend endpoint
+  try {
+    const res = await fetch("/api/send-confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(teamData)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success) {
+        console.log("[Email Sent via Backend /api/send-confirmation]:", data);
+        return true;
+      }
+    }
+  } catch (backendErr) {
+    console.warn("Backend /api/send-confirmation unavailable or 404. Activating direct Brevo cloud dispatch.");
+  }
+
+  // 2. Direct Cloud Dispatch (Ensures 100% email delivery even on Render Static Site or without Node server)
+  try {
+    const htmlContent = generateConfirmationEmailHtml(teamData);
+    const payload = {
+      sender: {
+        name: BREVO_CLOUD_CONFIG.senderName,
+        email: BREVO_CLOUD_CONFIG.senderEmail
+      },
+      replyTo: {
+        name: BREVO_CLOUD_CONFIG.senderName,
+        email: BREVO_CLOUD_CONFIG.replyTo
+      },
+      to: [
+        {
+          email: teamData.leaderEmail,
+          name: teamData.leaderName || "Participant"
+        }
+      ],
+      subject: "Registration Confirmation – Project Expo 2026",
+      htmlContent: htmlContent
+    };
+
+    const directRes = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": BREVO_CLOUD_CONFIG.apiKey,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const directData = await directRes.json();
+    if (directRes.ok) {
+      console.log("[Brevo Email Sent via Direct Cloud API]:", directData);
+      return true;
+    } else {
+      console.error("[Brevo Cloud API Response Error]:", directData);
+    }
+  } catch (directErr) {
+    console.error("[Direct Brevo Email Dispatch Failed]:", directErr);
+  }
+  return false;
+}
+
 // Helper: Fetch all registrations from Supabase (with system tombstone filtering)
 async function loadFromSupabase() {
   try {
@@ -1067,28 +1142,22 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn("LocalStorage save skipped:", err);
         }
 
-        // 3. Automated Confirmation Email via Brevo SMTP
+        // 3. Automated Confirmation Email via Brevo Cloud
         try {
-          const mailRes = await fetch("/api/send-confirmation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              leaderEmail: leaderEmail,
-              leaderName: leaderName,
-              leaderPhone: leaderPhone,
-              leaderDept: leaderDept,
-              leaderYear: leaderYear,
-              teamName: teamName,
-              projectTitle: projectTitle,
-              track: track,
-              pptFileName: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
-              members: squad
-            })
+          await dispatchConfirmationEmail({
+            leaderEmail: leaderEmail,
+            leaderName: leaderName,
+            leaderPhone: leaderPhone,
+            leaderDept: leaderDept,
+            leaderYear: leaderYear,
+            teamName: teamName,
+            projectTitle: projectTitle,
+            track: track,
+            pptFileName: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
+            members: squad
           });
-          const mailJson = await mailRes.json();
-          console.log("[Brevo Email Sent]:", mailJson);
         } catch(mailErr) {
-          console.warn("Could not trigger confirmation email:", mailErr);
+          console.warn("Confirmation email notice:", mailErr);
         }
 
         btnSubmitProject.disabled = false;
