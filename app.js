@@ -1067,10 +1067,36 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn("LocalStorage save skipped:", err);
         }
 
+        // 3. Automated Confirmation Email via Brevo SMTP
+        try {
+          fetch("/api/send-confirmation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              leaderEmail: leaderEmail,
+              leaderName: leaderName,
+              leaderPhone: leaderPhone,
+              leaderDept: leaderDept,
+              leaderYear: leaderYear,
+              teamName: teamName,
+              projectTitle: projectTitle,
+              track: track,
+              pptFileName: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
+              members: squad
+            })
+          }).then(r => r.json()).then(res => {
+            console.log("[Brevo Email Sent]:", res);
+          }).catch(err => {
+            console.warn("[Email Dispatch Notice]:", err);
+          });
+        } catch(mailErr) {
+          console.warn("Could not trigger confirmation email:", mailErr);
+        }
+
         btnSubmitProject.disabled = false;
         btnSubmitProject.innerHTML = originalBtnText;
 
-        // 3. Show celebratory success screen
+        // 4. Show celebratory success screen
         showSuccessScreen(teamData.teamName, teamData.leaderName);
       };
 

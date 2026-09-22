@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template Preview — Project Expo 2026 Confirmation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #e5e0d8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .preview-bar {
+      max-width: 640px;
+      margin: 0 auto 16px auto;
+      background: #111827;
+      color: #f7f5f0;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .preview-bar strong {
+      color: #10b981;
+    }
+    .preview-container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    iframe {
+      width: 100%;
+      height: 960px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <div><strong>BREVO SMTP EMAIL PREVIEW</strong> &bull; Registration Confirmation</div>
+    <div>Theme: Beige &amp; Black &bull; Zero Emojis</div>
+  </div>
+  <div class="preview-container">
+    <iframe id="preview-frame"></iframe>
+  </div>
+
+  <script type="module">
+    import { generateConfirmationEmailHtml } from './emailTemplate.js';
+
+    const sampleData = {
+      leaderName: "Arun Kumar",
+      teamName: "NeuralForge",
+      projectTitle: "Autonomous Agricultural Drone & AI Crop Diagnostics",
+      track: "Hardware & IoT",
+      leaderDept: "Artificial Intelligence & Data Science",
+      leaderYear: "3rd Year",
+      leaderEmail: "arunkumar.sample@example.com",
+      leaderPhone: "+91 98765 43210",
+      pptFileName: "NeuralForge_Project_Expo_2026.pptx",
+      members: [
+        { name: "Priya Sundaram", role: "Hardware Lead", dept: "Electronics & Communication" },
+        { name: "Vignesh Raj", role: "AI & Embedded Dev", dept: "Artificial Intelligence & Data Science" }
+      ]
+    };
+
+    const html = generateConfirmationEmailHtml(sampleData);
+    const frame = document.getElementById("preview-frame");
+    frame.srcdoc = html;
+  </script>
+</body>
+</html>
