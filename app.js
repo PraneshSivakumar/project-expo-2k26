@@ -1564,10 +1564,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Admin Portal Login Logic
   const btnAdminLogin = document.getElementById("btn-admin-login");
+  const adminPassInput = document.getElementById("admin-password");
+
+  if (adminPassInput && btnAdminLogin) {
+    adminPassInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btnAdminLogin.click();
+      }
+    });
+  }
+
   if (btnAdminLogin) {
     btnAdminLogin.addEventListener("click", async () => {
       const pass = document.getElementById("admin-password").value;
-      if (pass === "admin123") {
+      if (pass === "Pranesh@321") {
         document.getElementById("admin-login-view").style.display = "none";
         document.getElementById("admin-dashboard-view").style.display = "block";
         document.getElementById("admin-dashboard-view").classList.remove("hidden");
