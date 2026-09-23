@@ -32,6 +32,7 @@ import { generateConfirmationEmailHtml } from "./emailTemplate.js";
 })();
 document.addEventListener("DOMContentLoaded", () => {
   (D(), $(), N(), P(), H(), O(), Y(), F(), z(), V(), _());
+  checkAndApplyRegistrationCapacity();
 });
 function D() {
   const t = new Date("2026-09-28T23:59:59+05:30").getTime();
@@ -868,6 +869,72 @@ async function loadFromSupabase() {
   }
 }
 
+// REGISTRATION CAPACITY CONTROLLER (STOP AT 60 REGISTERED TEAMS)
+const MAX_TEAMS_CAPACITY = 60;
+
+async function checkAndApplyRegistrationCapacity() {
+  const wizardRoot = document.getElementById("wizard-root");
+  const closedCard = document.getElementById("registration-closed-card");
+  const capacityPill = document.getElementById("registration-capacity-pill");
+  const capacityText = document.getElementById("capacity-text");
+  const heroBtn = document.getElementById("hero-register-btn");
+
+  let count = 0;
+  try {
+    const cloud = await loadFromSupabase();
+    if (cloud !== null) {
+      count = cloud.length;
+    } else {
+      const local = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+      count = local.length;
+    }
+  } catch (e) {
+    try {
+      const local = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+      count = local.length;
+    } catch(err) {
+      count = 0;
+    }
+  }
+
+  const isFull = count >= MAX_TEAMS_CAPACITY;
+  const remaining = Math.max(0, MAX_TEAMS_CAPACITY - count);
+
+  // Update capacity indicator pill
+  if (capacityPill && capacityText) {
+    if (isFull) {
+      capacityPill.classList.add("closed");
+      capacityText.textContent = `Registration Closed: Maximum ${MAX_TEAMS_CAPACITY}/${MAX_TEAMS_CAPACITY} Teams Reached`;
+    } else {
+      capacityPill.classList.remove("closed");
+      capacityText.textContent = `Live Team Slots: ${count} / ${MAX_TEAMS_CAPACITY} Teams Registered (${remaining} spots remaining)`;
+    }
+  }
+
+  // Lock wizard or show closed card on registration page
+  if (wizardRoot && closedCard) {
+    if (isFull) {
+      wizardRoot.style.display = "none";
+      closedCard.classList.remove("hidden");
+    } else {
+      wizardRoot.style.display = "block";
+      closedCard.classList.add("hidden");
+    }
+  }
+
+  // Update homepage Register button if present
+  if (heroBtn) {
+    if (isFull) {
+      heroBtn.innerHTML = `<span>Registration Closed (60 Teams Limit Reached)</span>`;
+      heroBtn.style.pointerEvents = "none";
+      heroBtn.style.opacity = "0.7";
+      heroBtn.style.filter = "grayscale(40%)";
+    }
+  }
+
+  return { count, isFull, remaining };
+}
+
 // Helper: Delete all submissions from Supabase and local cache
 async function clearAllFromSupabase() {
   const timestamp = Date.now();
@@ -1055,10 +1122,26 @@ function setupPPTDropzone() {
 // ADMIN PORTAL & SUBMISSION LOGIC (SUPABASE CLOUD CONNECTED)
 document.addEventListener("DOMContentLoaded", () => {
   setupPPTDropzone();
+  checkAndApplyRegistrationCapacity();
   // Submission Save Logic
   const btnSubmitProject = document.getElementById("btn-submit-project");
   if (btnSubmitProject) {
     btnSubmitProject.addEventListener("click", async () => {
+      // 1. Strict live verification against 60-team quota limit
+      const currentSubs = await loadFromSupabase();
+      let currentCount = 0;
+      if (currentSubs !== null) {
+        currentCount = currentSubs.length;
+      } else {
+        const local = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+        currentCount = local.length;
+      }
+
+      if (currentCount >= MAX_TEAMS_CAPACITY) {
+        alert("Registration is officially closed. The maximum limit of 60 registered teams has been reached.");
+        await checkAndApplyRegistrationCapacity();
+        return;
+      }
       const pptInput = document.getElementById("ppt-upload");
       const pptFile = pptInput && pptInput.files ? pptInput.files[0] : null;
       const githubUrl = document.getElementById("repo-link")?.value.trim() || "";
@@ -1165,6 +1248,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 4. Show celebratory success screen
         showSuccessScreen(teamData.teamName, teamData.leaderName);
+        checkAndApplyRegistrationCapacity();
       };
 
       if (pptFile) {
@@ -1208,6 +1292,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (totalTeamsEl) totalTeamsEl.textContent = total;
+    const capacityStatusEl = document.getElementById("stat-capacity-status");
+    if (capacityStatusEl) {
+      if (total >= MAX_TEAMS_CAPACITY) {
+        capacityStatusEl.innerHTML = `<span style="color:#ef4444; font-weight:700;">Cap: 60 Teams • CLOSED (Full)</span>`;
+      } else {
+        capacityStatusEl.innerHTML = `<span style="color:#10b981; font-weight:600;">Cap: 60 Teams • ${MAX_TEAMS_CAPACITY - total} slots left</span>`;
+      }
+    }
     if (softwareTeamsEl) softwareTeamsEl.textContent = softwareCount;
     if (hardwareTeamsEl) hardwareTeamsEl.textContent = hardwareCount;
     if (totalMembersEl) totalMembersEl.textContent = totalParticipants;
