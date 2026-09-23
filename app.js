@@ -813,7 +813,7 @@ async function loadFromSupabase() {
     // Check for clear-all reset timestamp and deleted team identifiers
     let latestClearTime = 0;
     const deletedTeamIds = new Set();
-    const deletedTeamNames = new Set();
+    const deletedTeamTombstones = [];
 
     try {
       const localClearTime = parseInt(localStorage.getItem("expo_cleared_timestamp") || "0", 10);
@@ -824,29 +824,45 @@ async function loadFromSupabase() {
 
     data.forEach(item => {
       const name = item.team_name || "";
+      const t = new Date(item.created_at).getTime();
       if (name === "__SYSTEM_DELETED_ALL__") {
-        const t = new Date(item.created_at).getTime();
         if (t > latestClearTime) latestClearTime = t;
       } else if (name === "__SYSTEM_DELETED_TEAM__") {
         if (item.leader_name) deletedTeamIds.add(item.leader_name);
-        if (item.project_title) deletedTeamNames.add(item.project_title);
+        if (item.project_title) deletedTeamTombstones.push({ name: item.project_title.toLowerCase().trim(), time: t });
       }
     });
 
     const valid = data.filter(item => {
       const name = item.team_name || "";
       if (name.startsWith("__SYSTEM_")) return false;
-      if (latestClearTime > 0) {
-        const t = new Date(item.created_at).getTime();
-        if (t <= latestClearTime) return false;
+      const itemTime = new Date(item.created_at).getTime();
+      if (latestClearTime > 0 && itemTime <= latestClearTime) {
+        return false;
       }
-      if (deletedTeamIds.has(item.id) || deletedTeamIds.has(name) || deletedTeamNames.has(name)) {
+      if (deletedTeamIds.has(item.id)) {
+        return false;
+      }
+      // Only delete by name if tombstone was created at or after this registration
+      const isDeletedByName = deletedTeamTombstones.some(dt => dt.name === name.toLowerCase().trim() && itemTime <= dt.time);
+      if (isDeletedByName) {
         return false;
       }
       return true;
     });
 
-    return valid.map(item => ({
+    // Automatic De-duplication: Ensure identical team entries (from double-clicks/network retries) appear exactly once
+    const seen = new Set();
+    const deduplicated = [];
+    for (const item of valid) {
+      const key = `${(item.team_name || "").toLowerCase().trim()}_${(item.leader_email || "").toLowerCase().trim()}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduplicated.push(item);
+      }
+    }
+
+    return deduplicated.map(item => ({
       id: item.id,
       teamName: item.team_name,
       leaderName: item.leader_name,
@@ -1126,22 +1142,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Submission Save Logic
   const btnSubmitProject = document.getElementById("btn-submit-project");
   if (btnSubmitProject) {
-    btnSubmitProject.addEventListener("click", async () => {
-      // 1. Strict live verification against 60-team quota limit
-      const currentSubs = await loadFromSupabase();
-      let currentCount = 0;
-      if (currentSubs !== null) {
-        currentCount = currentSubs.length;
-      } else {
-        const local = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
-        currentCount = local.length;
-      }
+    btnSubmitProject.addEventListener("click", async (e) => {
+      if (e) e.preventDefault();
 
-      if (currentCount >= MAX_TEAMS_CAPACITY) {
-        alert("Registration is officially closed. The maximum limit of 60 registered teams has been reached.");
-        await checkAndApplyRegistrationCapacity();
+      // Immediate double-click & duplicate submission lock
+      if (btnSubmitProject.disabled || btnSubmitProject.dataset.submitting === "true") {
         return;
       }
+
+      const originalBtnText = btnSubmitProject.innerHTML;
+      btnSubmitProject.dataset.submitting = "true";
+      btnSubmitProject.disabled = true;
+      btnSubmitProject.innerHTML = '<span>Verifying &amp; Registering... ⏳</span>';
+
+      const resetBtn = () => {
+        btnSubmitProject.disabled = false;
+        btnSubmitProject.dataset.submitting = "false";
+        btnSubmitProject.innerHTML = originalBtnText;
+      };
+
       const pptInput = document.getElementById("ppt-upload");
       const pptFile = pptInput && pptInput.files ? pptInput.files[0] : null;
       const githubUrl = document.getElementById("repo-link")?.value.trim() || "";
@@ -1158,6 +1177,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!pptFile && !driveUrl) {
         alert("Please provide either your PPT PDF or a Google Drive / Demo link.");
+        resetBtn();
+        return;
+      }
+
+      // Check for rapid repeat submission (within 15 seconds)
+      const currentSubKey = `${teamName.toLowerCase().trim()}_${leaderEmail.toLowerCase().trim()}`;
+      const lastSubTime = parseInt(sessionStorage.getItem("last_sub_time") || "0", 10);
+      const lastSubKey = sessionStorage.getItem("last_sub_key") || "";
+      if (lastSubKey === currentSubKey && (Date.now() - lastSubTime < 15000)) {
+        alert("Your registration has already been submitted! Please wait.");
+        resetBtn();
+        return;
+      }
+      sessionStorage.setItem("last_sub_time", String(Date.now()));
+      sessionStorage.setItem("last_sub_key", currentSubKey);
+
+      // 1. Strict live verification against 60-team quota limit
+      const currentSubs = await loadFromSupabase();
+      let currentCount = 0;
+      if (currentSubs !== null) {
+        currentCount = currentSubs.length;
+      } else {
+        const local = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+        currentCount = local.length;
+      }
+
+      if (currentCount >= MAX_TEAMS_CAPACITY) {
+        alert("Registration is officially closed. The maximum limit of 60 registered teams has been reached.");
+        resetBtn();
+        await checkAndApplyRegistrationCapacity();
         return;
       }
 
@@ -1170,8 +1219,6 @@ document.addEventListener("DOMContentLoaded", () => {
         squad.push({ name: mName, role: mRole, dept: mDept });
       });
 
-      const originalBtnText = btnSubmitProject.innerHTML;
-      btnSubmitProject.disabled = true;
       btnSubmitProject.innerHTML = '<span>Uploading Slide Deck & Registering... ⏳</span>';
 
       const proceedSubmit = async (fileDataUrl) => {
@@ -1244,6 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         btnSubmitProject.disabled = false;
+        btnSubmitProject.dataset.submitting = "false";
         btnSubmitProject.innerHTML = originalBtnText;
 
         // 4. Show celebratory success screen
