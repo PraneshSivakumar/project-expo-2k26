@@ -798,7 +798,7 @@ async function dispatchConfirmationEmail(teamData) {
 // Helper: Fetch all registrations from Supabase (with system tombstone filtering)
 async function loadFromSupabase() {
   try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?select=*&order=created_at.desc`, {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?select=id,team_name,leader_name,leader_email,leader_phone,leader_dept,leader_year,members,track,project_title,ppt_file_name,github,drive,created_at&order=created_at.desc`, {
       headers: {
         "apikey": SUPABASE_CONFIG.key,
         "Authorization": `Bearer ${SUPABASE_CONFIG.key}`
@@ -1414,6 +1414,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download PDF</span>
           </a>`;
+      } else if (sub.pptFileName && sub.pptFileName !== "N/A" && !sub.pptFileName.toLowerCase().includes("drive")) {
+        pptHtml = `
+          <button type="button" class="btn-ppt-download btn-download-cloud-pdf" data-sub-id="${sub.id}" data-file-name="${sub.pptFileName || 'Presentation.pdf'}" title="Click to download ${sub.pptFileName}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download PDF</span>
+          </button>`;
       } else if (sub.drive && sub.drive !== "N/A" && sub.drive.startsWith("http")) {
         pptHtml = `
           <a href="${sub.drive}" target="_blank" class="btn-ppt-download" style="background:#04547c;" title="Open in Google Drive">
@@ -1494,6 +1500,46 @@ document.addEventListener("DOMContentLoaded", () => {
       const deleteBtn = row.querySelector(".btn-row-delete-team");
       if (deleteBtn) {
         deleteBtn.addEventListener("click", () => openDeleteTeamModal(sub));
+      }
+
+      const cloudPdfBtn = row.querySelector(".btn-download-cloud-pdf");
+      if (cloudPdfBtn) {
+        cloudPdfBtn.addEventListener("click", async () => {
+          const subId = cloudPdfBtn.getAttribute("data-sub-id");
+          const fileName = cloudPdfBtn.getAttribute("data-file-name") || "Presentation.pdf";
+          const originalText = cloudPdfBtn.innerHTML;
+          cloudPdfBtn.disabled = true;
+          cloudPdfBtn.innerHTML = `<span>Loading... ⏳</span>`;
+          try {
+            const fRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=eq.${subId}&select=ppt_file_data`, {
+              headers: {
+                "apikey": SUPABASE_CONFIG.key,
+                "Authorization": `Bearer ${SUPABASE_CONFIG.key}`
+              }
+            });
+            if (fRes.ok) {
+              const fData = await fRes.json();
+              if (fData && fData[0] && fData[0].ppt_file_data) {
+                const a = document.createElement("a");
+                a.href = fData[0].ppt_file_data;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              } else {
+                alert("Slide deck data is not available for this team.");
+              }
+            } else {
+              alert("Could not load slide deck from cloud.");
+            }
+          } catch(err) {
+            console.error("Error downloading PDF:", err);
+            alert("Network error while downloading slide deck.");
+          } finally {
+            cloudPdfBtn.disabled = false;
+            cloudPdfBtn.innerHTML = originalText;
+          }
+        });
       }
 
       tbody.appendChild(row);
