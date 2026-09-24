@@ -11,7 +11,6 @@ export default defineConfig({
         guidelines: resolve(__dirname, 'guidelines.html'),
         schedule: resolve(__dirname, 'schedule.html'),
         registration: resolve(__dirname, 'registration.html'),
-        faq: resolve(__dirname, 'faq.html'),
         contact: resolve(__dirname, 'contact.html'),
         admin: resolve(__dirname, 'admin.html'),
         emailPreview: resolve(__dirname, 'email-preview.html')
