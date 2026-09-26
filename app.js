@@ -1791,7 +1791,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const cloudData = await loadFromSupabase();
     let localData = [];
     try {
-      localData = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+      const rawLocal = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+      localData = rawLocal.map(item => ({
+        ...item,
+        members: (Array.isArray(item.members) ? item.members : []).filter(
+          m => !(m && (m.role === "Team Leader" || (m.name && (item.leaderName || item.leader_name) && m.name.trim().toLowerCase() === (item.leaderName || item.leader_name).trim().toLowerCase())))
+        )
+      }));
     } catch(e) {}
 
     if (cloudData && cloudData.length > 0) {
