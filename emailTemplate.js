@@ -2,6 +2,8 @@
 export function generateConfirmationEmailHtml(data) {
   const {
     leaderName = "Participant",
+    leaderRollNo = "",
+    collegeName = "VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS",
     teamName = "Registered Team",
     projectTitle = "Project Submission",
     track = "Software Project",
@@ -19,7 +21,7 @@ export function generateConfirmationEmailHtml(data) {
     <tr style="background-color:#ffffff; border-bottom:1px solid #e7e3da;">
       <td style="padding:12px 16px; font-size:13px; font-weight:700; color:#111827;">
         Member 1: ${escapeHtml(leaderName)} <span style="font-size:11px; font-weight:600; color:#0c8c5e; background-color:#ecfdf5; padding:2px 8px; border-radius:4px; margin-left:6px;">Team Leader</span>
-        <div style="font-weight:400; font-size:12px; color:#525252; margin-top:3px;">${escapeHtml(leaderEmail)}${leaderPhone ? ` • ${escapeHtml(leaderPhone)}` : ''} • ${escapeHtml(leaderDept)}${leaderYear ? ` (${escapeHtml(leaderYear)})` : ''}</div>
+        <div style="font-weight:400; font-size:12px; color:#525252; margin-top:3px;">${escapeHtml(leaderEmail)}${leaderRollNo ? ` • Roll: ${escapeHtml(leaderRollNo)}` : ''}${leaderPhone ? ` • ${escapeHtml(leaderPhone)}` : ''} • ${escapeHtml(leaderDept)}${leaderYear ? ` (${escapeHtml(leaderYear)})` : ''}</div>
       </td>
     </tr>
   `;
@@ -29,7 +31,7 @@ export function generateConfirmationEmailHtml(data) {
       <tr style="background-color:#ffffff; border-bottom:1px solid #e7e3da;">
         <td style="padding:12px 16px; font-size:13px; font-weight:600; color:#111827;">
           Member ${idx + 2}: ${escapeHtml(m.name || `Collaborator ${idx + 2}`)} <span style="font-size:11px; font-weight:500; color:#525252;">(${escapeHtml(m.role || 'Member')})</span>
-          <div style="font-weight:400; font-size:12px; color:#525252; margin-top:3px;">${escapeHtml(m.dept || 'Engineering')}</div>
+          <div style="font-weight:400; font-size:12px; color:#525252; margin-top:3px;">${m.rollNo ? `Roll: ${escapeHtml(m.rollNo)} • ` : ''}${escapeHtml(m.dept || 'Engineering')}</div>
         </td>
       </tr>
     `;
@@ -125,6 +127,10 @@ export function generateConfirmationEmailHtml(data) {
                 <tr>
                   <td style="padding:8px 0 4px 0; color:#525252; font-size:13px; width:30%;">Team Name:</td>
                   <td style="padding:8px 0 4px 0; color:#111827; font-size:14px; font-weight:700;">${escapeHtml(teamName)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:#525252; font-size:13px;">College:</td>
+                  <td style="padding:4px 0; color:#0c8c5e; font-size:13px; font-weight:700;">${escapeHtml(collegeName)}</td>
                 </tr>
                 <tr>
                   <td style="padding:4px 0; color:#525252; font-size:13px;">Project Title:</td>

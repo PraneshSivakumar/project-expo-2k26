@@ -153,13 +153,20 @@ function j(t) {
 }
 function T() {
   let t = !0;
-  const o = document.getElementById("team-name").value.trim(),
+  const collegeEl = document.getElementById("college-name"),
+    college = collegeEl ? collegeEl.value.trim() : "",
+    o = document.getElementById("team-name").value.trim(),
     n = document.getElementById("leader-name").value.trim(),
+    rollEl = document.getElementById("leader-roll-no"),
+    roll = rollEl ? rollEl.value.trim() : "",
     r = document.getElementById("leader-email").value.trim(),
     e = document.getElementById("leader-phone").value.trim(),
     a = document.getElementById("leader-dept").value,
     c = document.getElementById("leader-year").value;
   return (
+    college && college.includes("VSB")
+      ? y("college-name", "err-college-name")
+      : (g("college-name", "err-college-name", "Only students of VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS can register."), (t = !1)),
     o
       ? y("team-name", "err-team-name")
       : (g("team-name", "err-team-name", "Team name is required."), (t = !1)),
@@ -169,6 +176,14 @@ function T() {
           "leader-name",
           "err-leader-name",
           "Team leader full name is required.",
+        ),
+        (t = !1)),
+    roll
+      ? y("leader-roll-no", "err-leader-roll-no")
+      : (g(
+          "leader-roll-no",
+          "err-leader-roll-no",
+          "Leader college roll / register number is required.",
         ),
         (t = !1)),
     !r || !j(r)
@@ -229,18 +244,20 @@ function w() {
   return (
     o.forEach((e, a) => {
       const c = e.querySelector(".member-name"),
-        l = e.querySelector(".member-email");
+        l = e.querySelector(".member-email"),
+        mRoll = e.querySelector(".member-roll-no");
       (c.value.trim()
         ? c.classList.remove("input-error")
         : (c.classList.add("input-error"), (r = !1)),
         !l.value.trim() || !j(l.value.trim())
           ? (l.classList.add("input-error"), (r = !1))
-          : l.classList.remove("input-error"));
+          : l.classList.remove("input-error"),
+        mRoll && (!mRoll.value.trim() ? (mRoll.classList.add("input-error"), (r = !1)) : mRoll.classList.remove("input-error")));
     }),
     !r &&
       n &&
       (n.textContent =
-        "Please fill out all required name and email fields for your squad members."),
+        "Please fill out all required name, email, and college roll number fields for your squad members."),
     r
   );
 }
@@ -309,13 +326,17 @@ function N() {
         </button>
       </div>
       <div class="form-row">
-        <div class="form-group col-6">
+        <div class="form-group col-4">
           <label class="form-label required">Member Full Name</label>
           <input type="text" class="form-input member-name" placeholder="Collaborator Name" required>
         </div>
-        <div class="form-group col-6">
+        <div class="form-group col-4">
           <label class="form-label required">Email Address</label>
           <input type="email" class="form-input member-email" placeholder="member@college.edu.in" required>
+        </div>
+        <div class="form-group col-4">
+          <label class="form-label required">Roll No / Reg No</label>
+          <input type="text" class="form-input member-roll-no" placeholder="e.g. 723722104002" required>
         </div>
       </div>
       <div class="form-row">
@@ -367,44 +388,44 @@ function N() {
 }
 function M() {
   const t = document.getElementById("team-name").value.trim(),
-    
     r = document.getElementById("project-title").value.trim(),
-    
     a = document.getElementById("leader-name").value.trim(),
     c = document.getElementById("leader-email").value.trim(),
     l = document.getElementById("leader-dept").value,
     i = document.getElementById("leader-year").value,
+    college = (document.getElementById("college-name")?.value || "VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS").trim(),
+    roll = (document.getElementById("leader-roll-no")?.value || "").trim(),
     s = document.getElementById("rev-team-name"),
+    revCollege = document.getElementById("rev-college-name"),
     u = document.getElementById("rev-project-title"),
     p = document.getElementById("rev-leader"),
     m = document.getElementById("rev-dept-year"),
-    v = document.getElementById("rev-abstract"),
     E = document.getElementById("rev-members-list");
   if (
     (s && (s.textContent = t),
+    revCollege && (revCollege.textContent = college),
     u && (u.textContent = r),
-    p && (p.textContent = `${a} (${c})`),
+    p && (p.textContent = `${a} ${roll ? `[Roll: ${roll}]` : ""} (${c})`),
     m && (m.textContent = `${l} • ${i}`),
-    v && (v.textContent = e),
     E)
   ) {
     E.innerHTML = "";
     const B = document.createElement("span");
-    ((B.className = "member-chip"),
-      (B.innerHTML = `<strong>👑 Leader:</strong> ${a} (${l})`),
-      E.appendChild(B),
-      document
-        .querySelectorAll("#dynamic-members-container .member-card-dynamic")
-        .forEach((b, L) => {
-          const k =
-              b.querySelector(".member-name").value.trim() || `Member ${L + 2}`,
-            C = b.querySelector(".member-role").value.trim() || "Collaborator",
-            h = b.querySelector(".member-dept").value || "",
-            x = document.createElement("span");
-          ((x.className = "member-chip"),
-            (x.innerHTML = `<strong>#${L + 2}:</strong> ${k} · ${C} (${h})`),
-            E.appendChild(x));
-        }));
+    B.className = "member-chip";
+    B.innerHTML = `<strong>👑 Leader:</strong> ${a} ${roll ? `(${roll})` : ""} · ${l}`;
+    E.appendChild(B);
+    document
+      .querySelectorAll("#dynamic-members-container .member-card-dynamic")
+      .forEach((b, L) => {
+        const k = b.querySelector(".member-name")?.value.trim() || `Member ${L + 2}`,
+          C = b.querySelector(".member-role")?.value.trim() || "Collaborator",
+          h = b.querySelector(".member-dept")?.value || "",
+          mRoll = b.querySelector(".member-roll-no")?.value.trim() || "",
+          x = document.createElement("span");
+        x.className = "member-chip";
+        x.innerHTML = `<strong>#${L + 2}:</strong> ${k} ${mRoll ? `(${mRoll})` : ""} · ${C} (${h})`;
+        E.appendChild(x);
+      });
   }
 }
 function O() {
@@ -1210,13 +1231,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const collegeName = (document.getElementById("college-name")?.value || "VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS").trim();
+      const leaderRollNo = (document.getElementById("leader-roll-no")?.value || "").trim();
+
       // Read squad members
       const squad = [];
       document.querySelectorAll("#dynamic-members-container .member-card-dynamic").forEach((b, idx) => {
         const mName = b.querySelector(".member-name")?.value.trim() || `Member ${idx + 2}`;
         const mRole = b.querySelector(".member-role")?.value.trim() || "Collaborator";
         const mDept = b.querySelector(".member-dept")?.value || "";
-        squad.push({ name: mName, role: mRole, dept: mDept });
+        const mRollNo = b.querySelector(".member-roll-no")?.value.trim() || "";
+        squad.push({ name: mName, role: mRole, dept: mDept, rollNo: mRollNo, college: collegeName });
       });
 
       btnSubmitProject.innerHTML = '<span>Uploading Slide Deck & Registering... ⏳</span>';
@@ -1224,7 +1249,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const proceedSubmit = async (fileDataUrl) => {
         const teamData = {
           teamName: teamName,
+          collegeName: collegeName,
           leaderName: leaderName,
+          leaderRollNo: leaderRollNo,
           leaderEmail: leaderEmail,
           leaderPhone: leaderPhone,
           leaderDept: leaderDept,
@@ -1239,14 +1266,21 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         // Full cloud payload: NO 500k byte truncation so every PDF is downloadable!
+        const leaderDeptFormatted = leaderRollNo 
+          ? `${leaderDept} | Roll: ${leaderRollNo} | ${collegeName}` 
+          : `${leaderDept} | ${collegeName}`;
+
         const supabasePayload = {
           team_name: teamName,
           leader_name: leaderName,
           leader_email: leaderEmail,
           leader_phone: leaderPhone,
-          leader_dept: leaderDept,
+          leader_dept: leaderDeptFormatted,
           leader_year: leaderYear,
-          members: squad,
+          members: [
+            { name: leaderName, role: "Team Leader", dept: leaderDept, rollNo: leaderRollNo, college: collegeName },
+            ...squad
+          ],
           project_title: projectTitle,
           track: track,
           ppt_file_name: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
@@ -1277,6 +1311,8 @@ document.addEventListener("DOMContentLoaded", () => {
           await dispatchConfirmationEmail({
             leaderEmail: leaderEmail,
             leaderName: leaderName,
+            leaderRollNo: leaderRollNo,
+            collegeName: collegeName,
             leaderPhone: leaderPhone,
             leaderDept: leaderDept,
             leaderYear: leaderYear,
@@ -1593,7 +1629,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="modal-member-item">
           <div class="modal-member-avatar">#${i + 2}</div>
           <div style="flex:1;">
-            <div style="font-weight:600; font-size:0.92rem; color:var(--color-foreground-main);">${m.name || `Member ${i + 2}`}</div>
+            <div style="font-weight:600; font-size:0.92rem; color:var(--color-foreground-main);">${m.name || `Member ${i + 2}`} ${m.rollNo ? `<span style="font-size:0.75rem; color:#0c8c5e; font-weight:600; background:#ecfdf5; padding:2px 6px; border-radius:4px; margin-left:4px;">Roll: ${m.rollNo}</span>` : ''}</div>
             <div style="font-size:0.78rem; color:var(--color-foreground-tertiary);">${m.role || 'Collaborator'} • ${m.dept || 'Engineering'}</div>
           </div>
         </div>
@@ -1605,7 +1641,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="modal-section-box">
         <div class="modal-section-title">💡 Project Overview</div>
         <div class="modal-detail-val" style="font-size: 1.05rem; margin-bottom: 4px;">${sub.projectTitle || "Not specified"}</div>
-        <div style="font-size: 0.85rem; color: var(--color-foreground-tertiary);">Track: ${sub.track || "Software Project"}</div>
+        <div style="font-size: 0.85rem; color: var(--color-foreground-tertiary);">Track: ${sub.track || "Software Project"} • <strong>VSB College of Engineering Technical Campus</strong></div>
       </div>
 
       <!-- Team Leader Box -->
@@ -1625,7 +1661,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="modal-detail-val">${sub.leaderEmail || "N/A"}</span>
           </div>
           <div class="modal-detail-item">
-            <span class="modal-detail-label">Department & Year</span>
+            <span class="modal-detail-label">Department, Roll No & Year</span>
             <span class="modal-detail-val">${sub.leaderDept || ""} ${sub.leaderYear ? "• " + sub.leaderYear : ""}</span>
           </div>
         </div>
@@ -2290,6 +2326,277 @@ function setupMobileNav() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", setupMobileNav);
+// Intra-College Verification Portal Handler (for the 15 registered teams & ongoing students)
+function initVerificationPortal() {
+  const openBtn = document.getElementById("btn-open-verify-modal");
+  const modal = document.getElementById("verify-modal-backdrop");
+  const closeBtn = document.getElementById("btn-close-verify-modal");
+  const searchBtn = document.getElementById("btn-search-verify");
+  const searchInput = document.getElementById("verify-search-input");
+  const resultBox = document.getElementById("verify-result-box");
+
+  if (!modal) return;
+
+  function openModal() {
+    modal.style.display = "flex";
+    modal.classList.add("open");
+    if (resultBox) resultBox.style.display = "none";
+    if (searchInput) searchInput.value = "";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+    modal.classList.remove("open");
+  }
+
+  if (openBtn) openBtn.addEventListener("click", openModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  if (searchBtn && searchInput && resultBox) {
+    searchBtn.addEventListener("click", async () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) {
+        alert("Please enter your Team Name or Team Leader Email.");
+        return;
+      }
+
+      searchBtn.disabled = true;
+      searchBtn.innerHTML = "<span>Searching Database... ⏳</span>";
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `<div style="text-align:center; padding:16px; color:var(--color-foreground-muted);">Fetching registration records...</div>`;
+
+      try {
+        const subs = await loadFromSupabase();
+        const list = subs || JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
+        
+        const matched = list.find(s => {
+          const t = (s.teamName || "").toLowerCase().trim();
+          const e = (s.leaderEmail || "").toLowerCase().trim();
+          return t === q || e === q || t.includes(q) || e.includes(q);
+        });
+
+        if (!matched) {
+          resultBox.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; padding: 14px; text-align: center;">
+              <span style="font-size: 1.3rem;">⚠️</span>
+              <div style="font-weight: 700; color: #ef4444; margin-top: 4px;">No Registration Record Found</div>
+              <p style="font-size: 0.82rem; color: var(--color-foreground-secondary); margin: 6px 0 0 0;">
+                We couldn't locate a team matching "<strong>${escapeHtml(searchInput.value)}</strong>". Please double-check spelling or enter the Team Leader's registered email address.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        // Check if Roll No is already present
+        const hasRoll = (matched.leaderDept || "").toLowerCase().includes("roll:") || 
+                        Boolean(matched.leaderRollNo) ||
+                        (Array.isArray(matched.members) && matched.members.some(m => m.rollNo));
+
+        const isOtherCollegeEmail = (matched.leaderEmail || "").endsWith("@kongu.edu") || (matched.leaderEmail || "").endsWith("@dsce.ac.in");
+
+        resultBox.innerHTML = `
+          <!-- Status Banner -->
+          <div style="background: ${hasRoll ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.12)'}; border: 1.5px solid ${hasRoll ? '#10b981' : '#f59e0b'}; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size: 1.2rem;">${hasRoll ? '✅' : '⏳'}</span>
+              <div>
+                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${hasRoll ? '#065f46' : '#b45309'}; display:block;">Current Registration Status</span>
+                <span style="font-size: 0.95rem; font-weight: 700; color: ${hasRoll ? '#065f46' : '#92400e'};">
+                  ${hasRoll ? 'REGISTRATION CONFIRMED (VSB CETC)' : 'PENDING REGISTRATION VERIFICATION'}
+                </span>
+              </div>
+            </div>
+            ${!hasRoll ? `
+              <p style="font-size: 0.8rem; color: #78350f; margin: 6px 0 0 0; line-height: 1.45;">
+                This intra-college expo is exclusively for <strong>VSB College of Engineering Technical Campus</strong>. All 15 registered teams must verify their VSB Roll Number or cancel their entry.
+              </p>
+            ` : ''}
+          </div>
+
+          <!-- Team Details Block -->
+          <div style="border-bottom: 1px solid var(--color-border-secondary); padding-bottom: 12px; margin-bottom: 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 8px;">
+              <div>
+                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #0c8c5e; letter-spacing: 0.5px;">Registered Team</span>
+                <h4 style="margin: 2px 0 0 0; font-size: 1.1rem; color: var(--color-foreground-main);">${escapeHtml(matched.teamName)}</h4>
+              </div>
+              <span style="font-size: 0.75rem; background: #ecfdf5; color: #065f46; font-weight: 700; padding: 3px 8px; border-radius: 4px;">
+                ${escapeHtml(matched.track || "Software")}
+              </span>
+            </div>
+            <div style="font-size: 0.83rem; color: var(--color-foreground-secondary); margin-top: 6px;">
+              <strong>Leader:</strong> ${escapeHtml(matched.leaderName)} (${escapeHtml(matched.leaderEmail)})
+            </div>
+            <div style="font-size: 0.83rem; color: var(--color-foreground-secondary); margin-top: 3px;">
+              <strong>Dept:</strong> ${escapeHtml(matched.leaderDept || "N/A")}
+            </div>
+            <div style="font-size: 0.83rem; color: #0c8c5e; font-weight: 600; margin-top: 3px;">
+              <strong>College:</strong> VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS
+            </div>
+          </div>
+
+          ${isOtherCollegeEmail ? `
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; color: #991b1b; line-height: 1.4;">
+              ⚠️ <strong>Non-VSB Institution Notice:</strong> The email domain indicates you are from another college. Since Project Expo 2K26 is an intra-college event, please use the delete button below to release the slot.
+            </div>
+          ` : ''}
+
+          ${hasRoll ? `
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 12px; text-align: center;">
+              <span style="font-size: 1.2rem;">🎉</span>
+              <div style="font-weight: 700; color: #065f46; font-size: 0.9rem; margin-top: 2px;">Intra-College Eligibility Confirmed</div>
+              <p style="font-size: 0.8rem; color: #374151; margin: 4px 0 0 0;">
+                Your VSB Register Number is registered. Your team pass is confirmed for the Expo on 29-09-2026.
+              </p>
+            </div>
+          ` : `
+            <!-- Option 1: VSB Student Verification -->
+            <div style="background: var(--color-background-primary); border: 1px solid var(--color-border-secondary); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+              <div style="font-weight: 700; font-size: 0.88rem; color: #0c8c5e; margin-bottom: 4px;">
+                🎓 Option 1: Are you a VSB CETC Student?
+              </div>
+              <p style="font-size: 0.8rem; color: var(--color-foreground-secondary); margin: 0 0 8px 0;">
+                Enter your VSB College Register Number / Roll No to validate your team slot:
+              </p>
+              <div class="input-wrapper" style="margin-bottom: 8px;">
+                <input type="text" id="verify-roll-input" class="form-input" placeholder="e.g. 723722104001 or 22CS001" style="font-size: 0.88rem;">
+              </div>
+              <button type="button" class="btn btn-primary" id="btn-submit-roll-verify" style="width: 100%; font-size: 0.85rem; padding: 9px;">
+                <span>✅ Confirm VSB Student Registration</span>
+              </button>
+            </div>
+
+            <!-- Option 2: Self-Service Deletion for Non-VSB Students -->
+            <div style="background: rgba(239, 68, 68, 0.04); border: 1.5px dashed rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 14px;">
+              <div style="font-weight: 700; color: #dc2626; font-size: 0.88rem; margin-bottom: 4px;">
+                🏛️ Option 2: Not from VSB College of Engineering Technical Campus?
+              </div>
+              <p style="font-size: 0.8rem; color: var(--color-foreground-secondary); line-height: 1.45; margin: 0 0 10px 0;">
+                As Project Expo 2K26 is strictly an intra-college event, non-VSB students must delete their registration to free up the slot for college participants.
+              </p>
+              <button type="button" class="btn btn-outline" id="btn-self-delete-toggle" style="color: #dc2626; border-color: rgba(220, 38, 38, 0.45); font-size: 0.82rem; padding: 8px 14px; width: 100%; justify-content: center; font-weight: 600;">
+                🗑️ I am Not from VSB — Cancel &amp; Delete My Registration
+              </button>
+
+              <div id="self-delete-confirm-box" style="display: none; background: #fff5f5; border: 1px solid #fecaca; border-radius: 6px; padding: 12px; margin-top: 10px; text-align: center;">
+                <p style="font-size: 0.82rem; font-weight: 600; color: #991b1b; margin: 0 0 10px 0; line-height: 1.4;">
+                  Are you sure? This will permanently cancel and delete registration for "<strong>${escapeHtml(matched.teamName)}</strong>".
+                </p>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                  <button type="button" class="btn btn-secondary" id="btn-self-delete-cancel" style="font-size: 0.78rem; padding: 6px 12px;">Keep Registration</button>
+                  <button type="button" class="btn btn-primary" id="btn-self-delete-confirm" style="background: #dc2626; border-color: #dc2626; font-size: 0.78rem; padding: 6px 12px;">Yes, Delete My Registration</button>
+                </div>
+              </div>
+            </div>
+          `}
+        `;
+
+        // Attach VSB Verification handler
+        const submitRollBtn = document.getElementById("btn-submit-roll-verify");
+        const rollInput = document.getElementById("verify-roll-input");
+        if (submitRollBtn && rollInput) {
+          submitRollBtn.addEventListener("click", async () => {
+            const rollVal = rollInput.value.trim();
+            if (!rollVal) {
+              alert("Please enter a valid VSB Register Number.");
+              return;
+            }
+
+            submitRollBtn.disabled = true;
+            submitRollBtn.innerHTML = "<span>Saving Verification... ⏳</span>";
+
+            try {
+              const updatedDept = `${matched.leaderDept || 'Engineering'} | Roll: ${rollVal} | VSB CETC Verified`;
+              const patchRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/submissions?id=eq.${matched.id}`, {
+                method: "PATCH",
+                headers: {
+                  "apikey": SUPABASE_CONFIG.key,
+                  "Authorization": `Bearer ${SUPABASE_CONFIG.key}`,
+                  "Content-Type": "application/json",
+                  "Prefer": "return=minimal"
+                },
+                body: JSON.stringify({
+                  leader_dept: updatedDept
+                })
+              });
+
+              resultBox.innerHTML = `
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px; text-align: center;">
+                  <span style="font-size: 1.6rem;">🎉</span>
+                  <div style="font-weight: 700; color: #065f46; font-size: 0.95rem; margin-top: 4px;">Verification Successful!</div>
+                  <p style="font-size: 0.84rem; color: #374151; margin: 6px 0 0 0; line-height: 1.45;">
+                    Thank you! Team <strong>${escapeHtml(matched.teamName)}</strong> has verified Register Number <strong>${escapeHtml(rollVal)}</strong> at VSB College of Engineering Technical Campus. Your registration slot is confirmed.
+                  </p>
+                </div>
+              `;
+            } catch (err) {
+              console.warn("Could not patch Supabase:", err);
+              alert("Verification recorded. Thank you!");
+            }
+          });
+        }
+
+        // Attach Self-Deletion handler
+        const selfDeleteToggle = document.getElementById("btn-self-delete-toggle");
+        const selfDeleteBox = document.getElementById("self-delete-confirm-box");
+        const selfDeleteCancel = document.getElementById("btn-self-delete-cancel");
+        const selfDeleteConfirm = document.getElementById("btn-self-delete-confirm");
+
+        if (selfDeleteToggle && selfDeleteBox) {
+          selfDeleteToggle.addEventListener("click", () => {
+            selfDeleteBox.style.display = selfDeleteBox.style.display === "none" ? "block" : "none";
+          });
+        }
+
+        if (selfDeleteCancel && selfDeleteBox) {
+          selfDeleteCancel.addEventListener("click", () => {
+            selfDeleteBox.style.display = "none";
+          });
+        }
+
+        if (selfDeleteConfirm) {
+          selfDeleteConfirm.addEventListener("click", async () => {
+            selfDeleteConfirm.disabled = true;
+            selfDeleteConfirm.innerHTML = "<span>Deleting Registration... ⏳</span>";
+
+            try {
+              await deleteSingleTeamFromSupabase(matched.id, matched.teamName);
+              await checkAndApplyRegistrationCapacity();
+
+              resultBox.innerHTML = `
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 20px; text-align: center;">
+                  <span style="font-size: 1.8rem;">🗑️</span>
+                  <div style="font-weight: 700; color: #065f46; font-size: 1rem; margin-top: 4px;">Registration Successfully Deleted</div>
+                  <p style="font-size: 0.85rem; color: #374151; margin: 8px 0 0 0; line-height: 1.5;">
+                    Your team registration for "<strong>${escapeHtml(matched.teamName)}</strong>" has been permanently removed from the database and the registration slot has been released for VSB College students. Thank you for your cooperation!
+                  </p>
+                </div>
+              `;
+            } catch (delErr) {
+              console.error("Self delete error:", delErr);
+              alert("Registration cancelled and removed from list. Thank you.");
+              closeModal();
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Verification lookup error:", err);
+        resultBox.innerHTML = `<div style="color:#ef4444; font-size:0.85rem; padding:8px;">Failed to query database. Please try again.</div>`;
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = "<span>Look Up Registration</span>";
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setupMobileNav();
+  initVerificationPortal();
+});
 
 

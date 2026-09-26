@@ -48,6 +48,28 @@
           </div>
         </div>
 
+        <!-- Intra-College Notice & 15-Student Verification Banner -->
+        <div class="intra-college-banner" style="background: linear-gradient(135deg, rgba(12, 140, 94, 0.08), rgba(24, 226, 153, 0.12)); border: 1.5px solid rgba(12, 140, 94, 0.28); border-radius: 12px; padding: 18px 24px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; align-items: flex-start; gap: 14px; max-width: 820px;">
+            <div style="background: #0c8c5e; color: #ffffff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+              🏛️
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #0c8c5e; background: #e6f7f0; padding: 3px 8px; border-radius: 4px;">Exclusive Intra-College Event</span>
+                <span style="font-size: 0.82rem; font-weight: 600; color: #111827;">VSB College of Engineering Technical Campus Only</span>
+              </div>
+              <p style="margin: 0; font-size: 0.86rem; color: #374151; line-height: 1.5;">
+                Participation is strictly open to bonafide students of <strong>VSB College of Engineering Technical Campus</strong>. Outside college registrations cannot be accepted.
+                <strong>Registered in the initial 15 teams?</strong> Please verify your College Register Number to validate your team slot.
+              </p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline" id="btn-open-verify-modal" style="white-space: nowrap; font-size: 0.85rem; padding: 9px 18px; border-color: #0c8c5e; color: #0c8c5e; background: #ffffff; font-weight: 600; cursor: pointer;">
+            🔍 Verify Registered Team
+          </button>
+        </div>
+
         <!-- Registration Closed State Card (Hidden by default; shown if 60 teams registered) -->
         <div class="registration-closed-card hidden" id="registration-closed-card">
           <div class="closed-icon-badge">
@@ -141,6 +163,22 @@
               </div>
 
               <div class="form-row">
+                <div class="form-group col-12">
+                  <label for="college-name" class="form-label required">College / Institution Name</label>
+                  <div class="input-wrapper select-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"/></svg>
+                    <select id="college-name" class="form-input form-select" required style="cursor: default;">
+                      <option value="VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS" selected>VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS</option>
+                    </select>
+                  </div>
+                  <span class="field-hint" style="display:block; font-size: 0.75rem; color: var(--color-brand-base); font-weight: 500; margin-top: 4px;">
+                    🔒 Exclusive Intra-College Event — Restricted to VSB CETC students only.
+                  </span>
+                  <span class="field-error" id="err-college-name"></span>
+                </div>
+              </div>
+
+              <div class="form-row">
                 <div class="form-group col-6">
                   <label for="leader-name" class="form-label required">Team Leader Name</label>
                   <div class="input-wrapper">
@@ -150,6 +188,17 @@
                   <span class="field-error" id="err-leader-name"></span>
                 </div>
                 <div class="form-group col-6">
+                  <label for="leader-roll-no" class="form-label required">Leader College Roll No / Register No</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <input type="text" id="leader-roll-no" class="form-input" placeholder="e.g. 723722104001 or 22CS001" required>
+                  </div>
+                  <span class="field-error" id="err-leader-roll-no"></span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
                   <label for="leader-email" class="form-label required">Leader College / Personal Email</label>
                   <div class="input-wrapper">
                     <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -157,10 +206,7 @@
                   </div>
                   <span class="field-error" id="err-leader-email"></span>
                 </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group col-4">
+                <div class="form-group col-6">
                   <label for="leader-phone" class="form-label required">WhatsApp Contact Number</label>
                   <div class="input-wrapper">
                     <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -168,6 +214,7 @@
                   </div>
                   <span class="field-error" id="err-leader-phone"></span>
                 </div>
+              </div>
                 <div class="form-group col-4">
                   <label for="leader-dept" class="form-label required">Department</label>
                   <select id="leader-dept" class="form-input form-select" required>
@@ -374,11 +421,15 @@
                     <span class="review-val highlight" id="rev-team-name">—</span>
                   </div>
                   <div class="review-cell col-span-4">
+                    <span class="review-label">College / Institution</span>
+                    <span class="review-val highlight" id="rev-college-name">VSB COLLEGE OF ENGINEERING TECHNICAL CAMPUS</span>
+                  </div>
+                  <div class="review-cell col-span-4">
                     <span class="review-label">Project Title</span>
                     <span class="review-val project-title-val" id="rev-project-title">—</span>
                   </div>
                   <div class="review-cell col-span-2">
-                    <span class="review-label">Leader Name & Email</span>
+                    <span class="review-label">Leader Name, Roll No & Email</span>
                     <span class="review-val" id="rev-leader">—</span>
                   </div>
                   <div class="review-cell col-span-2">
@@ -437,8 +488,42 @@
         <p class="footer-tagline">Intra-College Technical Exhibition & Innovation Challenge.<br>Innovate. Collaborate. Create. Repeat.</p>
         <span class="footer-copyright">© 2026 Project Expo. All rights reserved.</span>
       </div>
-      </div>
+    </div>
   </footer>
+
+  <!-- Verification Modal for the Initial 15 Registered Teams -->
+  <div class="admin-modal-backdrop" id="verify-modal-backdrop" style="display: none;">
+    <div class="admin-modal-card" style="max-width: 540px;">
+      <div class="modal-header-strip" style="background: linear-gradient(135deg, #111827, #1f2937); color: #ffffff; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div>
+          <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #10b981; margin-bottom: 4px;">Intra-College Verification Portal</div>
+          <h3 class="modal-title" style="color: #ffffff; font-size: 1.2rem; margin: 0;">Verify College Register Number</h3>
+          <p class="modal-subtitle" style="color: #9ca3af; font-size: 0.8rem; margin: 4px 0 0 0;">Exclusive to VSB College of Engineering Technical Campus</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-verify-modal" style="color: #9ca3af; background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+      <div class="modal-body-content" style="padding: 24px 24px;">
+        <p style="font-size: 0.88rem; color: var(--color-foreground-secondary); line-height: 1.5; margin-bottom: 16px;">
+          If your team is registered in the first 15 slots, enter your <strong>Team Name</strong> or <strong>Team Leader Email</strong> below to confirm your VSB Roll Number and validate your entry.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label required">Team Name or Leader Email</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="verify-search-input" class="form-input" placeholder="e.g. Threat hunters or leader@gmail.com">
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-search-verify" style="margin-top: 10px; width: 100%;">
+            <span>Look Up Registration</span>
+          </button>
+        </div>
+
+        <div id="verify-result-box" style="display: none; background: var(--color-background-secondary); border: 1px solid var(--color-border-secondary); border-radius: 8px; padding: 16px; margin-top: 16px;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
