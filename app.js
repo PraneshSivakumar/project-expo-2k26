@@ -233,13 +233,10 @@ function w() {
       .getElementById("dynamic-members-container")
       .querySelectorAll(".member-card-dynamic"),
     n = document.getElementById("err-members-general");
-  if ((n && (n.textContent = ""), o.length < 0))
-    return (
-      n &&
-        (n.textContent =
-          "Please add at least 0 team member in addition to the leader (minimum 1 members required)."),
-      !1
-    );
+  if (o.length > 2) {
+    if (n) n.textContent = "Maximum team size is 3 members (Leader + up to 2 teammates).";
+    return false;
+  }
   let r = !0;
   return (
     o.forEach((e, a) => {
@@ -384,6 +381,19 @@ function N() {
       i && (i.innerHTML = `<span>👤 Member #${l + 2}</span>`);
     }),
       n && (n.textContent = a.length + 1));
+    if (o) {
+      if (a.length >= 2) {
+        o.setAttribute("disabled", "true");
+        o.style.opacity = "0.5";
+        o.style.cursor = "not-allowed";
+        o.title = "Maximum 3 members allowed (Team Leader + 2 teammates)";
+      } else {
+        o.removeAttribute("disabled");
+        o.style.opacity = "1";
+        o.style.cursor = "pointer";
+        o.title = "";
+      }
+    }
   }
 }
 function M() {
@@ -890,9 +900,9 @@ async function loadFromSupabase() {
       leaderEmail: item.leader_email || "",
       leaderPhone: item.leader_phone || "",
       leaderDept: item.leader_dept || "",
-      leaderYear: item.leader_year || "",
-      members: Array.isArray(item.members) ? item.members : [],
-      track: item.track || "Software Project",
+      members: (Array.isArray(item.members) ? item.members : []).filter(
+        m => !(m && (m.role === "Team Leader" || (m.name && item.leader_name && m.name.trim().toLowerCase() === item.leader_name.trim().toLowerCase())))
+      ),
       projectTitle: item.project_title || "",
       pptFileName: item.ppt_file_name || "N/A",
       pptFileData: item.ppt_file_data || "",
@@ -1244,6 +1254,12 @@ document.addEventListener("DOMContentLoaded", () => {
         squad.push({ name: mName, role: mRole, dept: mDept, rollNo: mRollNo, college: collegeName });
       });
 
+      if (squad.length > 2) {
+        alert("Maximum team size is 3 members (1 Team Leader + up to 2 teammates). Please remove extra teammates.");
+        resetBtn();
+        return;
+      }
+
       btnSubmitProject.innerHTML = '<span>Uploading Slide Deck & Registering... ⏳</span>';
 
       const proceedSubmit = async (fileDataUrl) => {
@@ -1277,10 +1293,7 @@ document.addEventListener("DOMContentLoaded", () => {
           leader_phone: leaderPhone,
           leader_dept: leaderDeptFormatted,
           leader_year: leaderYear,
-          members: [
-            { name: leaderName, role: "Team Leader", dept: leaderDept, rollNo: leaderRollNo, college: collegeName },
-            ...squad
-          ],
+          members: squad,
           project_title: projectTitle,
           track: track,
           ppt_file_name: pptFile ? pptFile.name : (driveUrl ? "Google Drive Presentation" : "N/A"),
@@ -1371,8 +1384,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let totalParticipants = 0;
     adminSubmissions.forEach(s => {
-      // 1 Leader + squad members
-      totalParticipants += 1 + (Array.isArray(s.members) ? s.members.length : 0);
+      // 1 Leader + squad members (ensuring leader is not counted twice)
+      const squadCount = (Array.isArray(s.members) ? s.members : []).filter(
+        m => !(m && (m.role === "Team Leader" || (m.name && s.leaderName && m.name.trim().toLowerCase() === s.leaderName.trim().toLowerCase())))
+      ).length;
+      totalParticipants += 1 + squadCount;
     });
 
     if (totalTeamsEl) totalTeamsEl.textContent = total;
@@ -1492,7 +1508,10 @@ document.addEventListener("DOMContentLoaded", () => {
            </a>`
         : "";
 
-      const memberCount = (Array.isArray(sub.members) ? sub.members.length : 0) + 1;
+      const cleanSquad = (Array.isArray(sub.members) ? sub.members : []).filter(
+        m => !(m && (m.role === "Team Leader" || (m.name && sub.leaderName && m.name.trim().toLowerCase() === sub.leaderName.trim().toLowerCase())))
+      );
+      const memberCount = cleanSquad.length + 1;
 
       row.innerHTML = `
         <td style="color: var(--color-foreground-muted); font-weight: 600;">${idx + 1}</td>
@@ -1619,7 +1638,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modalTitle.textContent = `${sub.teamName} — Roster & Project`;
     modalSubtitle.textContent = `Track: ${sub.track || "Software Project"} • Registered: ${sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "Active"}`;
 
-    const members = Array.isArray(sub.members) ? sub.members : [];
+    const rawMembers = Array.isArray(sub.members) ? sub.members : [];
+    const members = rawMembers.filter(
+      m => !(m && (m.role === "Team Leader" || (m.name && sub.leaderName && m.name.trim().toLowerCase() === sub.leaderName.trim().toLowerCase())))
+    );
 
     let membersListHtml = "";
     if (members.length === 0) {
@@ -1727,9 +1749,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const rows = adminSubmissions.map(s => {
-      const squadNames = Array.isArray(s.members) 
-        ? s.members.map(m => `${m.name} (${m.role})`).join("; ") 
-        : "";
+      const cleanMembers = (Array.isArray(s.members) ? s.members : []).filter(
+        m => !(m && (m.role === "Team Leader" || (m.name && s.leaderName && m.name.trim().toLowerCase() === s.leaderName.trim().toLowerCase())))
+      );
+      const squadNames = cleanMembers.map(m => `${m.name} (${m.role})`).join("; ");
       
       return [
         `"${(s.teamName || "").replace(/"/g, '""')}"`,
