@@ -274,7 +274,10 @@ function P() {
       (o.forEach((e) => e.classList.remove("selected")),
         n.classList.add("selected"));
       const r = n.querySelector('input[type="radio"]');
-      r && (r.checked = !0);
+      if (r) {
+        r.checked = true;
+        r.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     });
   });
 }
@@ -900,6 +903,8 @@ async function loadFromSupabase() {
       leaderEmail: item.leader_email || "",
       leaderPhone: item.leader_phone || "",
       leaderDept: item.leader_dept || "",
+      leaderYear: item.leader_year || "",
+      track: item.track || "Software Project",
       members: (Array.isArray(item.members) ? item.members : []).filter(
         m => !(m && (m.role === "Team Leader" || (m.name && item.leader_name && m.name.trim().toLowerCase() === item.leader_name.trim().toLowerCase())))
       ),
@@ -1379,8 +1384,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Calculate metrics
     const total = adminSubmissions.length;
-    const softwareCount = adminSubmissions.filter(s => (s.track || "").toLowerCase().includes("software")).length;
     const hardwareCount = adminSubmissions.filter(s => (s.track || "").toLowerCase().includes("hardware")).length;
+    const softwareCount = total - hardwareCount;
     
     let totalParticipants = 0;
     adminSubmissions.forEach(s => {
@@ -1411,8 +1416,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply Filter & Search
     let filtered = adminSubmissions.filter(s => {
       // Track filter
-      if (adminActiveFilter === "software" && !(s.track || "").toLowerCase().includes("software")) return false;
-      if (adminActiveFilter === "hardware" && !(s.track || "").toLowerCase().includes("hardware")) return false;
+      const isHw = (s.track || "").toLowerCase().includes("hardware");
+      if (adminActiveFilter === "software" && isHw) return false;
+      if (adminActiveFilter === "hardware" && !isHw) return false;
 
       // Search filter
       if (adminSearchQuery) {
@@ -1453,10 +1459,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .toUpperCase();
 
       // Track Badge
-      const isSoftware = (sub.track || "").toLowerCase().includes("software");
-      const trackBadge = isSoftware 
-        ? `<span class="badge-software">● Software Project</span>`
-        : `<span class="badge-hardware">● Hardware Project</span>`;
+      const isHardware = (sub.track || "").toLowerCase().includes("hardware");
+      const trackBadge = isHardware 
+        ? `<span class="badge-hardware">● Hardware Project</span>`
+        : `<span class="badge-software">● Software Project</span>`;
 
       // PPT Download Button / Link
       let pptHtml = "";
@@ -1794,6 +1800,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const rawLocal = JSON.parse(localStorage.getItem("expoSubmissions") || "[]");
       localData = rawLocal.map(item => ({
         ...item,
+        track: item.track || "Software Project",
         members: (Array.isArray(item.members) ? item.members : []).filter(
           m => !(m && (m.role === "Team Leader" || (m.name && (item.leaderName || item.leader_name) && m.name.trim().toLowerCase() === (item.leaderName || item.leader_name).trim().toLowerCase())))
         )
