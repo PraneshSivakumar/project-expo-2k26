@@ -1754,6 +1754,12 @@ document.addEventListener("DOMContentLoaded", () => {
       "Submitted At"
     ];
 
+    const sanitize = (val) => {
+      if (val === null || val === undefined) return '""';
+      let str = String(val).replace(/"/g, '""').replace(/[\r\n]+/g, ' ');
+      return `"${str}"`;
+    };
+
     const rows = adminSubmissions.map(s => {
       const cleanMembers = (Array.isArray(s.members) ? s.members : []).filter(
         m => !(m && (m.role === "Team Leader" || (m.name && s.leaderName && m.name.trim().toLowerCase() === s.leaderName.trim().toLowerCase())))
@@ -1761,30 +1767,34 @@ document.addEventListener("DOMContentLoaded", () => {
       const squadNames = cleanMembers.map(m => `${m.name} (${m.role})`).join("; ");
       
       return [
-        `"${(s.teamName || "").replace(/"/g, '""')}"`,
-        `"${(s.leaderName || "").replace(/"/g, '""')}"`,
-        `"${(s.leaderPhone || "").replace(/"/g, '""')}"`,
-        `"${(s.leaderEmail || "").replace(/"/g, '""')}"`,
-        `"${(s.leaderDept || "").replace(/"/g, '""')}"`,
-        `"${(s.leaderYear || "").replace(/"/g, '""')}"`,
-        `"${(s.track || "").replace(/"/g, '""')}"`,
-        `"${(s.projectTitle || "").replace(/"/g, '""')}"`,
-        `"${squadNames.replace(/"/g, '""')}"`,
-        `"${(s.pptFileName || "").replace(/"/g, '""')}"`,
-        `"${(s.github || "").replace(/"/g, '""')}"`,
-        `"${(s.drive || "").replace(/"/g, '""')}"`,
-        `"${s.createdAt || ""}"`
+        sanitize(s.teamName),
+        sanitize(s.leaderName),
+        sanitize(s.leaderPhone),
+        sanitize(s.leaderEmail),
+        sanitize(s.leaderDept),
+        sanitize(s.leaderYear),
+        sanitize(s.track),
+        sanitize(s.projectTitle),
+        sanitize(squadNames),
+        sanitize(s.pptFileName),
+        sanitize(s.github),
+        sanitize(s.drive),
+        sanitize(s.createdAt)
       ].join(",");
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
+    // Add \uFEFF (UTF-8 BOM) so Excel opens UTF-8 characters properly
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.href = url;
     link.setAttribute("download", `Project_Expo_2K26_Registrations_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   // Load and refresh handler
