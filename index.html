@@ -15,6 +15,16 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+  <!-- Postponement Announcement Banner -->
+  <div class="announcement-bar">
+    <div class="announcement-container">
+      <span class="announcement-badge">IMPORTANT ANNOUNCEMENT</span>
+      <span class="announcement-text">
+        <strong>Event Postponed:</strong> Project Expo 2K26 has been postponed until further notice. Revised dates will be updated soon.
+      </span>
+    </div>
+  </div>
+
   <!-- Sticky Nav -->
   <header class="sticky-nav" id="main-nav">
     <div class="nav-container">
@@ -43,6 +53,17 @@
       </div>
 
       <div class="container hero-content">
+        <!-- Event Postponed Hero Alert Card -->
+        <div class="postponed-alert-card">
+          <div class="alert-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="alert-content">
+            <h3 class="alert-title">📢 Event Postponed</h3>
+            <p class="alert-desc">Project Expo 2K26 has been postponed until further notice. The updated schedule and revised dates will be communicated shortly to all participants.</p>
+          </div>
+        </div>
+
         <h1 class="hero-title" id="hero-heading">
           Ideas Today. <br>
           <span class="editorial-accent">A Better Tomorrow.</span>
@@ -71,7 +92,7 @@
             </div>
             <div class="strip-meta">
               <span class="strip-label">Event Date</span>
-              <span class="strip-value">Sept 29, 2026 • 10:00 AM</span>
+              <span class="strip-value" style="color: #c2410c; font-weight: 700;">Postponed (TBA)</span>
             </div>
           </div>
           <div class="strip-divider"></div>
@@ -99,31 +120,31 @@
         <!-- Live Countdown Widget -->
         <div class="countdown-card" id="countdown-banner">
           <div class="countdown-header">
-            <div class="countdown-pulse-tag">
-              <span class="pulse-ring"></span>
-              <span class="pulse-core"></span>
-              Registration Deadline Approaching
+            <div class="countdown-pulse-tag" style="background: rgba(194, 65, 12, 0.12); color: #c2410c; border-color: rgba(194, 65, 12, 0.3);">
+              <span class="pulse-ring" style="background-color: #c2410c;"></span>
+              <span class="pulse-core" style="background-color: #ea580c;"></span>
+              EVENT POSTPONED
             </div>
-            <span class="countdown-target-date">Closes Sept 28, 2026 • 11:59 PM IST</span>
+            <span class="countdown-target-date" style="color: #c2410c; font-weight: 600;">New dates will be announced soon</span>
           </div>
           <div class="countdown-timer" id="countdown-timer">
             <div class="time-block">
-              <span class="time-number" id="count-days">18</span>
+              <span class="time-number" id="count-days">--</span>
               <span class="time-label">Days</span>
             </div>
             <span class="time-colon">:</span>
             <div class="time-block">
-              <span class="time-number" id="count-hours">07</span>
+              <span class="time-number" id="count-hours">--</span>
               <span class="time-label">Hours</span>
             </div>
             <span class="time-colon">:</span>
             <div class="time-block">
-              <span class="time-number" id="count-minutes">42</span>
+              <span class="time-number" id="count-minutes">--</span>
               <span class="time-label">Mins</span>
             </div>
             <span class="time-colon">:</span>
             <div class="time-block">
-              <span class="time-number" id="count-seconds">15</span>
+              <span class="time-number" id="count-seconds">--</span>
               <span class="time-label">Secs</span>
             </div>
           </div>
