@@ -35,30 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   checkAndApplyRegistrationCapacity();
 });
 function D() {
-  const t = new Date("2026-09-28T23:59:59+05:30").getTime();
-  function o() {
-    const n = new Date().getTime(),
-      r = t - n;
-    if (r < 0) {
-      document.getElementById("countdown-timer").innerHTML =
-        '<span class="time-number">EXPO IS LIVE NOW</span>';
-      return;
-    }
-    const e = Math.floor(r / (1e3 * 60 * 60 * 24)),
-      a = Math.floor((r % (1e3 * 60 * 60 * 24)) / (1e3 * 60 * 60)),
-      c = Math.floor((r % (1e3 * 60 * 60)) / (1e3 * 60)),
-      l = Math.floor((r % (1e3 * 60)) / 1e3),
-      i = (m) => String(m).padStart(2, "0"),
-      s = document.getElementById("count-days"),
-      d = document.getElementById("count-hours"),
-      u = document.getElementById("count-minutes"),
-      p = document.getElementById("count-seconds");
-    (s && (s.textContent = i(e)),
-      d && (d.textContent = i(a)),
-      u && (u.textContent = i(c)),
-      p && (p.textContent = i(l)));
+  const elem = document.getElementById("countdown-timer");
+  if (elem) {
+    elem.innerHTML = '<span class="time-number" style="font-size: 1.15rem; letter-spacing: 0.04em; color: #c2410c; font-weight: 700;">EVENT POSTPONED — NEW DATES TBA</span>';
   }
-  (o(), setInterval(o, 1e3));
 }
 let I = 1;
 const A = 4;
