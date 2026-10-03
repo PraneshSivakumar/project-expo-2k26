@@ -15,12 +15,12 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Postponement Announcement Banner -->
+  <!-- Announcement Banner -->
   <div class="announcement-bar">
     <div class="announcement-container">
-      <span class="announcement-badge">IMPORTANT ANNOUNCEMENT</span>
+      <span class="announcement-badge">IMPORTANT NOTICE</span>
       <span class="announcement-text">
-        <strong>Event Postponed:</strong> Project Expo 2K26 has been postponed until further notice. Revised dates will be updated soon.
+        <strong>Registration Closed:</strong> Online team registrations are now officially closed. Project Expo 2K26 is postponed until further notice.
       </span>
     </div>
   </div>
@@ -52,20 +52,20 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           <div class="alert-content">
-            <h3 class="alert-title">📢 Notice: Event Postponed</h3>
-            <p class="alert-desc">Project Expo 2K26 has been postponed. Registered teams will be notified regarding the revised submission and presentation dates.</p>
+            <h3 class="alert-title">📢 Notice: Registration Officially Closed</h3>
+            <p class="alert-desc">Project Expo 2K26 team registration has officially closed. Registered teams will be notified regarding the revised submission and presentation dates.</p>
           </div>
         </div>
 
         <div class="section-header">
           <div class="section-eyebrow">05. REGISTRATION PORTAL</div>
-          <h2 class="section-title">Create your team and register <br><span class="serif-title">for Project Expo 2K26.</span></h2>
+          <h2 class="section-title">Registration Closed <br><span class="serif-title">for Project Expo 2K26.</span></h2>
           <p class="section-subtitle">
-            Complete the 4 simple steps below to generate your official registration pass and team ID.
+            Online submissions are officially closed. Already registered teams can verify their registration status below.
           </p>
-          <div class="registration-capacity-pill" id="registration-capacity-pill">
+          <div class="registration-capacity-pill closed" id="registration-capacity-pill">
             <span class="capacity-dot" id="capacity-dot"></span>
-            <span id="capacity-text">Team Slots: Checking availability...</span>
+            <span id="capacity-text">Registration Status: Officially Closed</span>
           </div>
         </div>
 
@@ -77,12 +77,11 @@
             </div>
             <div>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
-                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #0c8c5e; background: #e6f7f0; padding: 3px 8px; border-radius: 4px;">Exclusive Intra-College Event</span>
-                <span style="font-size: 0.82rem; font-weight: 600; color: #111827;">VSB College of Engineering Technical Campus Only</span>
+                <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #0c8c5e; background: #e6f7f0; padding: 3px 8px; border-radius: 4px;">Intra-College Verification Portal</span>
+                <span style="font-size: 0.82rem; font-weight: 600; color: #111827;">VSB College of Engineering Technical Campus</span>
               </div>
               <p style="margin: 0; font-size: 0.86rem; color: #374151; line-height: 1.5;">
-                Participation is strictly open to bonafide students of <strong>VSB College of Engineering Technical Campus</strong>. Outside college registrations cannot be accepted.
-                <strong>Registered in the initial 15 teams?</strong> Please verify your College Register Number to validate your team slot.
+                Registrations are closed. <strong>Already registered your team?</strong> Click the button to verify your team slot, members, and details using your Team Name or Leader Email.
               </p>
             </div>
           </div>
@@ -91,18 +90,18 @@
           </button>
         </div>
 
-        <!-- Registration Closed State Card (Hidden by default; shown if 60 teams registered) -->
-        <div class="registration-closed-card hidden" id="registration-closed-card">
+        <!-- Registration Closed State Card -->
+        <div class="registration-closed-card" id="registration-closed-card">
           <div class="closed-icon-badge">
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
           </div>
-          <span class="closed-tag">CAPACITY REACHED • 60 TEAMS</span>
+          <span class="closed-tag">REGISTRATIONS CLOSED</span>
           <h2 class="closed-title">Registration is Officially Closed</h2>
           <p class="closed-desc">
-            Project Expo 2K26 has reached its maximum ceiling of <strong>60 registered teams</strong>. We are no longer accepting new team submissions.
+            Online registration for Project Expo 2K26 is officially closed. We are no longer accepting new team submissions. Already registered teams can verify their registration status anytime.
           </p>
           <div class="closed-actions">
             <a href="/index.html" class="btn btn-secondary">
@@ -116,8 +115,8 @@
           </div>
         </div>
 
-        <!-- Wizard Shell -->
-        <div class="wizard-container" id="wizard-root">
+        <!-- Wizard Shell (Hidden when registration is closed) -->
+        <div class="wizard-container hidden" id="wizard-root" style="display: none;">
           <!-- Wizard Stepper Nav -->
           <div class="wizard-stepper">
             <button type="button" class="step-item active" data-step="1" id="step-btn-1">

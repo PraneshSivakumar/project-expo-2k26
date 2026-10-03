@@ -901,8 +901,9 @@ async function loadFromSupabase() {
   }
 }
 
-// REGISTRATION CAPACITY CONTROLLER (STOP AT 60 REGISTERED TEAMS)
+// REGISTRATION CAPACITY CONTROLLER (OFFICIALLY CLOSED)
 const MAX_TEAMS_CAPACITY = 60;
+const IS_REGISTRATION_CLOSED = true;
 
 async function checkAndApplyRegistrationCapacity() {
   const wizardRoot = document.getElementById("wizard-root");
@@ -929,42 +930,34 @@ async function checkAndApplyRegistrationCapacity() {
     }
   }
 
-  const isFull = count >= MAX_TEAMS_CAPACITY;
+  const isFull = IS_REGISTRATION_CLOSED || count >= MAX_TEAMS_CAPACITY;
   const remaining = Math.max(0, MAX_TEAMS_CAPACITY - count);
 
   // Update capacity indicator pill
   if (capacityPill && capacityText) {
-    if (isFull) {
-      capacityPill.classList.add("closed");
-      capacityText.textContent = `Registration Closed: Maximum ${MAX_TEAMS_CAPACITY}/${MAX_TEAMS_CAPACITY} Teams Reached`;
-    } else {
-      capacityPill.classList.remove("closed");
-      capacityText.textContent = `Live Team Slots: ${count} / ${MAX_TEAMS_CAPACITY} Teams Registered (${remaining} spots remaining)`;
-    }
+    capacityPill.classList.add("closed");
+    capacityText.textContent = `Registration Status: Officially Closed`;
   }
 
-  // Lock wizard or show closed card on registration page
-  if (wizardRoot && closedCard) {
-    if (isFull) {
-      wizardRoot.style.display = "none";
-      closedCard.classList.remove("hidden");
-    } else {
-      wizardRoot.style.display = "block";
-      closedCard.classList.add("hidden");
-    }
+  // Lock wizard and display closed card on registration page
+  if (wizardRoot) {
+    wizardRoot.style.display = "none";
+  }
+  if (closedCard) {
+    closedCard.classList.remove("hidden");
+    closedCard.style.display = "block";
   }
 
   // Update homepage Register button if present
   if (heroBtn) {
-    if (isFull) {
-      heroBtn.innerHTML = `<span>Registration Closed (60 Teams Limit Reached)</span>`;
-      heroBtn.style.pointerEvents = "none";
-      heroBtn.style.opacity = "0.7";
-      heroBtn.style.filter = "grayscale(40%)";
-    }
+    heroBtn.innerHTML = `<span>Registration Closed</span>`;
+    heroBtn.style.pointerEvents = "none";
+    heroBtn.style.opacity = "0.7";
+    heroBtn.style.filter = "grayscale(40%)";
+    heroBtn.setAttribute("disabled", "true");
   }
 
-  return { count, isFull, remaining };
+  return { count, isFull: true, remaining: 0 };
 }
 
 // Helper: Delete all submissions from Supabase and local cache
@@ -1219,8 +1212,8 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCount = local.length;
       }
 
-      if (currentCount >= MAX_TEAMS_CAPACITY) {
-        alert("Registration is officially closed. The maximum limit of 60 registered teams has been reached.");
+      if (IS_REGISTRATION_CLOSED || currentCount >= MAX_TEAMS_CAPACITY) {
+        alert("Registration is officially closed. New submissions are no longer accepted.");
         resetBtn();
         await checkAndApplyRegistrationCapacity();
         return;
@@ -1379,8 +1372,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (totalTeamsEl) totalTeamsEl.textContent = total;
     const capacityStatusEl = document.getElementById("stat-capacity-status");
     if (capacityStatusEl) {
-      if (total >= MAX_TEAMS_CAPACITY) {
-        capacityStatusEl.innerHTML = `<span style="color:#ef4444; font-weight:700;">Cap: 60 Teams • CLOSED (Full)</span>`;
+      if (IS_REGISTRATION_CLOSED || total >= MAX_TEAMS_CAPACITY) {
+        capacityStatusEl.innerHTML = `<span style="color:#ef4444; font-weight:700;">Registration Status: CLOSED (${total} Teams Registered)</span>`;
       } else {
         capacityStatusEl.innerHTML = `<span style="color:#10b981; font-weight:600;">Cap: 60 Teams • ${MAX_TEAMS_CAPACITY - total} slots left</span>`;
       }

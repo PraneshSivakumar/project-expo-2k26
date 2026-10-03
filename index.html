@@ -15,12 +15,12 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Postponement Announcement Banner -->
+  <!-- Announcement Banner -->
   <div class="announcement-bar">
     <div class="announcement-container">
-      <span class="announcement-badge">IMPORTANT ANNOUNCEMENT</span>
+      <span class="announcement-badge">IMPORTANT NOTICE</span>
       <span class="announcement-text">
-        <strong>Event Postponed:</strong> Project Expo 2K26 has been postponed until further notice. Revised dates will be updated soon.
+        <strong>Registration Closed:</strong> Online team registrations are now officially closed. Project Expo 2K26 is postponed until further notice.
       </span>
     </div>
   </div>
@@ -59,8 +59,8 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           <div class="alert-content">
-            <h3 class="alert-title">📢 Event Postponed</h3>
-            <p class="alert-desc">Project Expo 2K26 has been postponed until further notice. The updated schedule and revised dates will be communicated shortly to all participants.</p>
+            <h3 class="alert-title">📢 Registrations Closed &amp; Event Postponed</h3>
+            <p class="alert-desc">Online team registrations for Project Expo 2K26 are officially closed. The event has been postponed until further notice, and revised presentation dates will be communicated shortly.</p>
           </div>
         </div>
 
@@ -75,12 +75,12 @@
 
         <!-- CTA Buttons -->
         <div class="hero-cta-group">
-          <a href="/registration.html" class="btn btn-primary btn-lg" id="hero-register-btn">
-            <span>Register Your Team</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="/registration.html" class="btn btn-secondary btn-lg" id="hero-verify-btn">
-            <span>🔍 Verify Status (15 Teams)</span>
+          <button class="btn btn-secondary btn-lg" id="hero-register-btn" disabled style="opacity: 0.75; cursor: not-allowed; pointer-events: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Registration Closed</span>
+          </button>
+          <a href="/registration.html" class="btn btn-primary btn-lg" id="hero-verify-btn">
+            <span>🔍 Verify Registered Team</span>
           </a>
         </div>
 
